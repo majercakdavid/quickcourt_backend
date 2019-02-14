@@ -1,5 +1,5 @@
 # Latest version of Erlang-based Elixir installation: https://hub.docker.com/_/elixir/
-FROM elixir:1.8.1
+FROM elixir
 
 # Create and set home directory
 WORKDIR /opt/quickcourt_backend

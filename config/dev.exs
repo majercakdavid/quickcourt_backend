@@ -52,5 +52,5 @@ config :quickcourt_backend, QuickcourtBackend.Repo,
   username: "quickcourt",
   password: "quickcourt",
   database: "quickcourt_dev",
-  hostname: "localhost",
+  hostname: "host.docker.internal",
   pool_size: 10
