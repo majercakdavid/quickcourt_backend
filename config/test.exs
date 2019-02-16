@@ -11,8 +11,8 @@ config :logger, level: :warn
 
 # Configure your database
 config :quickcourt_backend, QuickcourtBackend.Repo,
-  username: "postgres",
-  password: "postgres",
-  database: "quickcourt_backend_test",
-  hostname: "localhost",
+  username: "quickcourt",
+  password: "quickcourt",
+  database: "quickcourt_dev",
+  hostname: "192.168.99.100",
   pool: Ecto.Adapters.SQL.Sandbox
