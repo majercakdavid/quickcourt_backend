@@ -1,6 +1,9 @@
 # Latest version of Erlang-based Elixir installation: https://hub.docker.com/_/elixir/
 FROM elixir
 
+# Install dependencies for HTML/PDF conversion and generation
+RUN sudo apt-get install xvfb libfontconfig wkhtmltopdf
+
 # Create and set home directory
 WORKDIR /opt/quickcourt_backend
 
@@ -26,6 +29,6 @@ RUN mix deps.compile
 RUN mix compile
 
 # Run the application itself
-CMD ./scripts/docker.sh
+CMD iex -S mix phx.server
 
 EXPOSE 4000
