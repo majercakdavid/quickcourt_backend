@@ -10,7 +10,7 @@ defmodule QuickcourtBackend.Shared.Country do
   end
 
   @doc false
-  def changeset(country, attrs) do
+  def changeset(country, attrs \\ %{}) do
     country
     |> cast(attrs, [:name])
     |> validate_required([:name])
