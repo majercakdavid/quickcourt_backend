@@ -1,0 +1,54 @@
+version: '3'
+
+services:
+  elixir:
+    container_name: elixir_quickcourt
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    expose:
+      - "4000"
+    ports:
+      - "4000:4000"
+    networks:
+      - postgres
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:11-alpine
+    container_name: postgres_quickcourt
+    environment:
+      POSTGRES_USER: "quickcourt"
+      POSTGRES_PASSWORD: "quickcourt"
+      POSTGRES_DB: "quickcourt_dev"
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres
+
+  pgadmin:
+    container_name: pgadmin_quickcourt
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "quickcourt"
+      PGADMIN_DEFAULT_PASSWORD: "quickcourt"
+    volumes:
+      - pgadmin:/root/.pgadmin
+    ports:
+      - "80:80"
+    networks:
+      - postgres
+    depends_on:
+      - postgres
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+    postgres:
+    pgadmin:
+    elixir:
