@@ -20,7 +20,7 @@ defmodule QuickcourtBackend.MixProject do
   def application do
     [
       mod: {QuickcourtBackend.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :pdf_generator]
     ]
   end
 
@@ -45,7 +45,10 @@ defmodule QuickcourtBackend.MixProject do
       {:absinthe_ecto, "~> 0.1.3"},
       {:cowboy, "~> 2.6.1"},
       {:plug_cowboy, "~> 2.0.1"},
-      {:poison, "~> 3.1.0"}
+      {:poison, "~> 3.1.0"},
+      {:pdf2htmlex, "~> 0.1"},
+      {:pdf_generator, ">=0.4.0" },
+      {:sneeze, "~> 1.1"}
     ]
   end
 

@@ -2,7 +2,7 @@
 FROM elixir
 
 # Install dependencies for HTML/PDF conversion and generation
-# RUN sudo apt-get install xvfb libfontconfig wkhtmltopdf
+RUN apt-get update && apt-get install -y wkhtmltopdf xvfb libfontconfig
 
 # Create and set home directory
 WORKDIR /opt/quickcourt_backend
@@ -27,6 +27,12 @@ RUN mix deps.compile
 
 # Compile the entire project
 RUN mix compile
+
+# Drop the database so it is empty
+RUN mix ecto.drop
+
+# Setup the database with demo data
+RUN mix ecto.setup
 
 # Run the application itself
 CMD iex -S mix phx.server
