@@ -2,7 +2,7 @@
 FROM elixir
 
 # Install dependencies for HTML/PDF conversion and generation
-# RUN sudo apt-get install xvfb libfontconfig wkhtmltopdf
+RUN apt-get update && apt-get install -y wkhtmltopdf xvfb libfontconfig
 
 # Create and set home directory
 WORKDIR /opt/quickcourt_backend
