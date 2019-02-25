@@ -3,11 +3,23 @@ defmodule QuickcourtBackend.Repo.Migrations.CreateClaims do
 
   def change do
     create table(:claims) do
+      add :case_number, :string, primary_key: true
       add :is_business, :boolean, default: false, null: false
+      add :claimant_name, :string
+      add :claimant_surname, :string
+      add :defendant_company_name, :string
+      add :claimant_city, :string
+      add :defendant_city, :string
+      add :claimant_zip, :string
+      add :defendant_zip, :string
       add :claimant_country_id, references(:countries)
       add :defendant_country_id, references(:countries)
       add :claimant_address, :string
       add :defendant_address, :string
+      add :claimant_email, :string
+      add :defendant_email, :string
+      add :claimant_phone, :string
+      add :defendant_phone, :string
       add :agreement_type_id, references(:agreement_types)
       add :issue_type_id, references(:issue_types)
       # add :resolution_type_id, references(:resolution_types)

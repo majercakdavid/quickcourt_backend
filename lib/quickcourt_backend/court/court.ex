@@ -50,8 +50,9 @@ defmodule QuickcourtBackend.Court do
 
   """
   def create_claim(attrs \\ %{}) do
+    new_id = :crypto.strong_rand_bytes(5) |> Base.url_encode64 |> binary_part(0, 5)
     {:ok, claim} =
-      %Claim{}
+      %Claim{case_number: new_id}
       |> Claim.changeset(attrs)
       |> Repo.insert()
 

@@ -1,134 +1,31 @@
 defmodule QuickcourtBackend.ClaimPdfGenerator do
-  @blue "#267ad3"
-  @foreground "#3c3c3c"
-  
-  def generate_pdf(items) do
-    html =
-      Sneeze.render([
-        :html,
-        [
-          :body,
-          %{
-            style:
-              style(%{
-                "font-family" => "Helvetica",
-                "font-size" => "20pt",
-                "color" => @foreground
-              })
-          },
-          render_header(),
-          render_list(items)
-        ]
-      ])
 
-    {:ok, filename} = PdfGenerator.generate(html, page_size: "A4", shell_params: ["--dpi", "300"])
-    {:ok, file_contents} = File.read filename
-    Base.encode64(file_contents)
-  end
+  alias EEx
 
-  defp style(style_map) do
-    style_map
-    |> Enum.map(fn {key, value} ->
-      "#{key}: #{value}"
+
+  def generate_pdf(claim) do
+    claim_list = Map.from_struct(claim)
+    |> Enum.filter(fn {k, v} -> !Enum.member?(["__meta__", "inserted_at", "updated_at"],  Atom.to_string(k)) && v != nil end)
+    |> Enum.map(fn {k, v} -> 
+      new_value = case v do
+        %DateTime{} -> to_string(v)
+        %{} -> to_string(v.name)
+        val -> to_string(val)
+      end
+      {k, new_value}
     end)
-    |> Enum.join(";")
-  end
+    html = EEx.eval_file("./assets/53C.1-European_Small_Claims_Form_A.html", claim_list)
 
-  defp render_header() do
-    # image_path =
-    #   'example-image.png'
-    #   |> Path.relative()
-    #   |> Path.absname()
+    try do
+      {:ok, filename} =
+        PdfGenerator.generate(html, page_size: "A4", shell_params: ["--dpi", "300"])
 
-    date = DateTime.utc_now()
-    date_string = "#{date.year}/#{date.month}/#{date.day}"
-
-    [
-      :div,
-      %{
-        style:
-          style(%{
-            "display" => "flex",
-            "flex-direction" => "column",
-            "align-items" => "flex-start",
-            "margin-bottom" => "40pt"
-          })
-      },
-      # [
-      #   :img,
-      #   %{
-      #     src: "file:///#{image_path}",
-      #     style:
-      #       style(%{
-      #         "display" => "inline-block",
-      #         "width" => "90pt;"
-      #       })
-      #   }
-      # ],
-      [
-        :div,
-        %{
-          style:
-            style(%{
-              "display" => "inline-block",
-              #"position" => "absolute",
-              "padding-left" => "20pt",
-              "margin-top" => "10pt"
-            })
-        },
-        [
-          :h1,
-          %{
-            style:
-              style(%{
-                "font-size" => "35pt",
-                "color" => @blue,
-                "margin-top" => "0pt",
-                "padding-top" => "0pt"
-              })
-          },
-          "Claim details"
-        ],
-        [
-          :h3,
-          %{
-            style:
-              style(%{
-                "font-size" => "20pt",
-                "margin-top" => "-20pt"
-              })
-          },
-          date_string
-        ]
-      ]
-    ]
-  end
-
-  defp render_list(items) do
-    list = [:ul, %{style: style(%{"list-style" => "none"})}]
-    list_items = Enum.map(items, &render_item/1)
-    list ++ list_items
-  end
-
-  defp render_item(item) do
-    [
-      :li,
-      [
-        :span,
-        %{
-          style:
-            style(%{
-              "display" => "inline-block",
-              "border" => "solid 2pt ",
-              "width" => "10pt",
-              "height" => "10pt",
-              "border-radius" => "2pt",
-              "margin-right" => "15pt"
-            })
-        }
-      ],
-      item,
-      [:hr]
-    ]
+      {:ok, file_contents} = File.read(filename)
+      Base.encode64(file_contents)
+    rescue
+      e -> 
+        IO.inspect(e)
+        throw e
+    end
   end
 end
