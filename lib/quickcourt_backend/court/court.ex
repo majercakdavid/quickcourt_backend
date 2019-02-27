@@ -50,14 +50,28 @@ defmodule QuickcourtBackend.Court do
 
   """
   def create_claim(attrs \\ %{}) do
-    new_id = :crypto.strong_rand_bytes(5) |> Base.url_encode64 |> binary_part(0, 5)
-    {:ok, claim} =
+    new_id = :crypto.strong_rand_bytes(5) |> Base.url_encode64() |> binary_part(0, 5)
+
+    claim_res =
       %Claim{case_number: new_id}
       |> Claim.changeset(attrs)
       |> Repo.insert()
 
-    preloaded_claim = Repo.preload(claim, [:claimant_country, :defendant_country, :agreement_type, :issue_type])
-    {:ok, preloaded_claim}
+    case claim_res do
+      {:ok, claim} ->
+        preloaded_claim =
+          Repo.preload(claim, [
+            :claimant_country,
+            :defendant_country,
+            :agreement_type,
+            :issue_type
+          ])
+
+        {:ok, preloaded_claim}
+
+      {:error, changeset} ->
+        {:error, Map.get(changeset, :errors)}
+    end
   end
 
   @doc """

@@ -48,9 +48,11 @@ config :phoenix, :stacktrace_depth, 20
 config :phoenix, :plug_init_mode, :runtime
 
 # Configure your database
+# for docker use: "host.docker.internal"
 config :quickcourt_backend, QuickcourtBackend.Repo,
   username: "quickcourt",
   password: "quickcourt",
   database: "quickcourt_dev",
   hostname: "host.docker.internal",
-  pool_size: 10
+  pool_size: 10,
+  port: "5432"
