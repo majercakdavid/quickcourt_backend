@@ -15,8 +15,8 @@ defmodule QuickcourtBackendWeb.CourtResolver do
           {:ok, Map.merge(Map.from_struct(claim), %{pdf_base64: generated_pdf})}
         rescue RuntimeError -> {:error, "There was an error generating PDF document"}
         end
-      _ ->
-        {:error, "There was an error creating claim"}
+      {:error, errors} ->
+        {:error, "Errors:" <> inspect(errors)}
     end
   end
 end
