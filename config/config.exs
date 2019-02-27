@@ -30,7 +30,10 @@ config :phoenix, :json_library, Jason
 import_config "#{Mix.env()}.exs"
 
 # PDF generator X server
-# config :pdf_generator,
-#     command_prefix: ["xvfb-run", "-a"]
+{os_family, os_name} = :os.type()
+if Atom.to_string os_family == "unix" do
+  config :pdf_generator,
+      command_prefix: ["xvfb-run", "-a"]
+end
 
 config :porcelain, driver: Porcelain.Driver.Basic
