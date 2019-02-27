@@ -1,8 +1,6 @@
 defmodule QuickcourtBackendWeb.Schema do
   use Absinthe.Schema
 
-  alias QuickcourtBackend.Shared.Country, as: Country
-
   alias QuickcourtBackendWeb.SharedResolver
   alias QuickcourtBackendWeb.CourtResolver
 
@@ -20,6 +18,11 @@ defmodule QuickcourtBackendWeb.Schema do
   object :agreement_type do
     field :id, non_null(:id)
     field :code, non_null(:string)
+    field :name, non_null(:string)
+  end
+
+  object :agreement_type_issue do
+    field :id, non_null(:id)
     field :name, non_null(:string)
   end
 
@@ -68,6 +71,10 @@ defmodule QuickcourtBackendWeb.Schema do
 
     field :agreement_types, list_of(:agreement_type) do
       resolve(&SharedResolver.all_agreement_types/3)
+    end
+
+    field :agreement_type_issues, list_of(:agreement_type_issue) do
+      resolve(&SharedResolver.all_agreement_type_issues/3)
     end
 
     # field :resolution_types, list_of(:enumeration) do

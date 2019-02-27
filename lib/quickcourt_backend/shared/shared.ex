@@ -7,6 +7,7 @@ defmodule QuickcourtBackend.Shared do
   alias QuickcourtBackend.Repo
 
   alias QuickcourtBackend.Shared.Country
+  alias QuickcourtBackend.Shared.AgreementTypeIssue
 
   @doc """
   Returns the list of countries.
@@ -388,6 +389,10 @@ defmodule QuickcourtBackend.Shared do
   """
   def change_agreement_type(%AgreementType{} = agreement_type) do
     AgreementType.changeset(agreement_type, %{})
+  end
+
+  def list_agreement_type_issues do
+    Repo.all(AgreementTypeIssue)
   end
 
   alias QuickcourtBackend.Shared.ResolutionType

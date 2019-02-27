@@ -21,6 +21,11 @@ defmodule QuickcourtBackendWeb.SharedResolver do
     {:ok, agreement_types}
   end
 
+  def all_agreement_type_issues(_root, _args, _info) do
+    agreement_types = Shared.list_agreement_type_issues()
+    {:ok, agreement_types}
+  end
+
   def all_resolution_types(_root, _args, _info) do
     resolution_types = Shared.list_resolution_types()
     {:ok, resolution_types}

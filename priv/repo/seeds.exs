@@ -11,6 +11,7 @@
 # and so on) as they will fail if something goes wrong.
 
 alias QuickcourtBackend.Shared.AgreementType
+alias QuickcourtBackend.Shared.AgreementTypeIssue
 alias QuickcourtBackend.Shared.IssueType
 alias QuickcourtBackend.Shared.Country
 alias QuickcourtBackend.Repo
@@ -41,6 +42,23 @@ agreement_types = [
   "23 Out-of-court settlement",
   "24 Maintenance agreement",
   "25 Other (please specify)"
+]
+
+agreement_type_issues = [
+  "Cancellation",
+  "Faulty goods or services",
+  "Issue with payment",
+  "Issue with delivery",
+  "Issue with unfair contract terms"
+]
+
+resolution_types = [
+  "7_1_cancellation_eu_us",
+  "7_2_7_1_demand_repair_replacement_according_to_contract",
+  "7_2_demand_repair_replacement_faulty_service_damage_option_1_eu",
+  "7_1_issue_with_delivery_eu_us",
+  "7_2_7_1_issue_with_unfair_contract_terms_term_cancellation",
+  "7_2_7_1_issue_with_unfair_contract_terms_contract_cancellation"
 ]
 
 issue_types = [
@@ -88,6 +106,10 @@ Enum.each(agreement_types, fn agreement_type ->
   code = String.slice(agreement_type, 0..1)
   name = String.slice(agreement_type, 3..-1)
   %AgreementType{code: code, name: name} |> Repo.insert!()
+end)
+
+Enum.each(agreement_type_issues, fn agreement_type_issue ->
+  %AgreementTypeIssue{name: agreement_type_issue} |> Repo.insert!()
 end)
 
 Enum.each(issue_types, fn issue_type ->
