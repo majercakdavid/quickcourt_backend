@@ -3,9 +3,6 @@ defmodule QuickcourtBackend.Court.Claim do
   import Ecto.Changeset
 
   alias QuickcourtBackend.Shared.Country
-  alias QuickcourtBackend.Shared.AgreementType
-  alias QuickcourtBackend.Shared.IssueType
-  # alias QuickcourtBackend.Shared.ResolutionType
 
   schema "claims" do
     field :case_number, :string
@@ -25,9 +22,11 @@ defmodule QuickcourtBackend.Court.Claim do
     field :defendant_email, :string
     field :claimant_phone, :string
     field :defendant_phone, :string
-    belongs_to :agreement_type, AgreementType
-    belongs_to :issue_type, IssueType
-    # belongs_to :resolution_type, ResolutionType
+    field :agreement_type, :string
+    field :agreement_type_issue, :string
+    field :circumstance_invoked, :string
+    field :first_resolution, :string
+    field :second_resolution, :string
     field :purchase_place, :string, default: "online"
     field :purchase_date, :utc_datetime
     field :delivery_place, :string, default: "online"
@@ -61,15 +60,16 @@ defmodule QuickcourtBackend.Court.Claim do
       :lack_discovery_date,
       :claimant_country_id,
       :defendant_country_id,
-      :agreement_type_id,
-      :issue_type_id
+      :agreement_type,
+      :agreement_type_issue,
+      :circumstance_invoked,
+      :first_resolution,
+      :second_resolution
     ])
     |> validate_required([:claimant_country_id, :defendant_country_id])
     |> fields_not_equal(:claimant_country_id, :defendant_country_id)
     |> foreign_key_constraint(:claimant_country_id)
     |> foreign_key_constraint(:defendant_country_id)
-    |> foreign_key_constraint(:agreement_type_id)
-    |> foreign_key_constraint(:issue_type_id)
     |> validate_required([:is_business])
   end
 

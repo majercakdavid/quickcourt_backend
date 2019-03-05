@@ -11,6 +11,7 @@
 # and so on) as they will fail if something goes wrong.
 
 alias QuickcourtBackend.Court.ClaimRule
+alias QuickcourtBackend.Shared.Country
 alias QuickcourtBackend.Repo
 
 File.stream!("./priv/repo/consumer_choices.csv")
@@ -28,7 +29,6 @@ File.stream!("./priv/repo/consumer_choices.csv")
   ]
 )
 |> Enum.each(fn {:ok, record} ->
-  IO.inspect(record)
   changeset = ClaimRule.changeset(%ClaimRule{}, record)
   Repo.insert!(changeset)
 end)
