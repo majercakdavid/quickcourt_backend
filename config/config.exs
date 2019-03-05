@@ -31,9 +31,10 @@ import_config "#{Mix.env()}.exs"
 
 # PDF generator X server
 {os_family, os_name} = :os.type()
-if Atom.to_string os_family == "unix" do
+
+if Atom.to_string(os_family == "unix") do
   config :pdf_generator,
-      command_prefix: ["xvfb-run", "-a"]
+    command_prefix: ["xvfb-run", "-a"]
 end
 
 config :porcelain, driver: Porcelain.Driver.Basic
