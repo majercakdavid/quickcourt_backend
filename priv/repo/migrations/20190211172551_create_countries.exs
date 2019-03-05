@@ -7,6 +7,5 @@ defmodule QuickcourtBackend.Repo.Migrations.CreateCountries do
 
       timestamps()
     end
-
   end
 end

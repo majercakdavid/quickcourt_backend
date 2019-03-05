@@ -16,24 +16,26 @@ defmodule QuickcourtBackendWeb.Schema do
   end
 
   object :agreement_type do
-    field :id, non_null(:id)
     field :code, non_null(:string)
-    field :name, non_null(:string)
+    field :label, non_null(:string)
   end
 
   object :agreement_type_issue do
-    field :id, non_null(:id)
-    field :name, non_null(:string)
+    field :label, non_null(:string)
+  end
+
+  object :circumstances_invoked do
+    field :code, non_null(:string)
+    field :label, non_null(:string)
+  end
+
+  object :resolution do
+    field :code, non_null(:string)
+    field :label, non_null(:string)
   end
 
   input_object :agreement_type_input do
     field :id, non_null(:id)
-  end
-
-  object :issue_type do
-    field :id, non_null(:id)
-    field :code, non_null(:string)
-    field :name, non_null(:string)
   end
 
   input_object :issue_type_input do
@@ -47,7 +49,7 @@ defmodule QuickcourtBackendWeb.Schema do
     field :claimant_address, non_null(:string)
     field :defendant_address, non_null(:string)
     field(:agreement_type, non_null(:agreement_type))
-    field(:issue_type, non_null(:issue_type))
+    field(:issue_type, non_null(:enumeration))
     field :purchase_place, :string
     field :purchase_date, non_null(:datetime)
     field :delivery_place, :string
@@ -61,36 +63,37 @@ defmodule QuickcourtBackendWeb.Schema do
       resolve(&SharedResolver.all_countries/3)
     end
 
-    # field :claim_types, list_of(:enumeration) do
-    #     resolve &SharedResolver.all_claim_types/3
-    # end
-
-    field :issue_types, list_of(:issue_type) do
-      resolve(&SharedResolver.all_issue_types/3)
-    end
-
     field :agreement_types, list_of(:agreement_type) do
-      resolve(&SharedResolver.all_agreement_types/3)
+      resolve(&CourtResolver.all_agreement_types/3)
     end
 
     field :agreement_type_issues, list_of(:agreement_type_issue) do
-      resolve(&SharedResolver.all_agreement_type_issues/3)
+      arg(:agreement_type, non_null(:string))
+      resolve(&CourtResolver.all_agreement_type_issues/3)
     end
 
-    # field :resolution_types, list_of(:enumeration) do
-    #     resolve &SharedResolver.all_resolution_types/3
-    # end
+    field :circumstances_invoked, list_of(:circumstances_invoked) do
+      arg(:agreement_type, non_null(:string))
+      arg(:agreement_type_issue, non_null(:string))
+      resolve(&CourtResolver.all_circumstances_invoked/3)
+    end
 
-    # field :claims, list_of(:claim) do
-    #   resolve(&CourtResolver.all_claims/3)
-    # end
+    field :first_resolutions, list_of(:resolution) do
+      arg(:agreement_type, non_null(:string))
+      arg(:agreement_type_issue, non_null(:string))
+      arg(:circumstance_invoked, non_null(:string))
+      resolve(&CourtResolver.all_first_resolutions/3)
+    end
+
+    field :second_resolutions, list_of(:resolution) do
+      arg(:agreement_type, non_null(:string))
+      arg(:agreement_type_issue, non_null(:string))
+      arg(:circumstance_invoked, non_null(:string))
+      resolve(&CourtResolver.all_second_resolutions/3)
+    end
   end
 
   mutation do
-    # field :create_country, :enumeration do
-    #     arg :name, non_null(:string)
-    #     resolve &SharedResolver.create_country/3
-    # end
     field :create_claim, :claim do
       arg(:is_business, non_null(:boolean))
       arg(:claimant_name, non_null(:string))

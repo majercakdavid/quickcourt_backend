@@ -7,6 +7,7 @@ defmodule QuickcourtBackendWeb.Router do
 
   scope "/" do
     pipe_through :api
+
     forward "/graphiql", Absinthe.Plug.GraphiQL,
       schema: QuickcourtBackendWeb.Schema,
       interface: :simple,
