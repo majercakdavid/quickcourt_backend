@@ -40,15 +40,16 @@ defmodule QuickcourtBackend.MixProject do
       {:postgrex, ">= 0.0.0"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
-      {:absinthe, "~> 1.4.14"}, 
+      {:absinthe, "~> 1.4.14"},
       {:absinthe_plug, "~> 1.4.6"},
       {:absinthe_ecto, "~> 0.1.3"},
       {:cowboy, "~> 2.6.1"},
       {:plug_cowboy, "~> 2.0.1"},
       {:poison, "~> 3.1.0"},
       {:pdf2htmlex, "~> 0.1"},
-      {:pdf_generator, ">=0.4.0" },
-      {:sneeze, "~> 1.1"}
+      {:pdf_generator, ">=0.4.0"},
+      {:sneeze, "~> 1.1"},
+      {:csv, "~> 2.2"}
     ]
   end
 
