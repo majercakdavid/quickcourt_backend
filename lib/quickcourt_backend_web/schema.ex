@@ -44,10 +44,21 @@ defmodule QuickcourtBackendWeb.Schema do
 
   object :claim do
     field :is_business, non_null(:boolean)
+    field :claimant_name, non_null(:string)
+    field :claimant_surname, non_null(:string)
+    field :defendant_company_name, non_null(:string)
+    field :claimant_city, non_null(:string)
+    field :defendant_city, non_null(:string)
+    field :claimant_zip, non_null(:string)
+    field :defendant_zip, non_null(:string)
     field(:claimant_country, non_null(:enumeration))
     field(:defendant_country, non_null(:enumeration))
     field :claimant_address, non_null(:string)
     field :defendant_address, non_null(:string)
+    field :claimant_email, non_null(:string)
+    field :defendant_email, non_null(:string)
+    field :claimant_phone, non_null(:string)
+    field :defendant_phone, non_null(:string)
     field :agreement_type, non_null(:string)
     field :agreement_type_issue, non_null(:string)
     field :circumstance_invoked, non_null(:string)
@@ -58,7 +69,14 @@ defmodule QuickcourtBackendWeb.Schema do
     field :delivery_place, :string
     field :delivery_date, non_null(:datetime)
     field :lack_discovery_date, non_null(:datetime)
-    field :pdf_base64, :string
+
+    field :claim_for_money, non_null(:boolean)
+    field :amount, non_null(:float)
+    field :currency, non_null(:string)
+
+    field :pdf_base64_small_claim_form, :string
+    field :pdf_base64_epo_a, :string
+    field :pdf_base64_warning_letter, :string
   end
 
   query do
@@ -117,13 +135,20 @@ defmodule QuickcourtBackendWeb.Schema do
       arg(:agreement_type, non_null(:string))
       arg(:agreement_type_issue, non_null(:string))
       arg(:circumstance_invoked, non_null(:string))
+      
       arg(:first_resolution, non_null(:string))
+      
       arg(:second_resolution, non_null(:string))
+      
       arg(:purchase_place, :string)
       arg(:purchase_date, non_null(:datetime))
       arg(:delivery_place, :string)
       arg(:delivery_date, non_null(:datetime))
       arg(:lack_discovery_date, non_null(:datetime))
+
+      arg(:claim_for_money, non_null(:boolean))
+      arg(:amount, non_null(:float))
+      arg(:currency, non_null(:string))
 
       resolve(&CourtResolver.create_claim/3)
     end

@@ -32,6 +32,10 @@ defmodule QuickcourtBackend.Court.Claim do
     field :delivery_place, :string, default: "online"
     field :delivery_date, :utc_datetime
     field :lack_discovery_date, :utc_datetime
+
+    field :claim_for_money, :boolean, default: false
+    field :amount, :float, default: nil
+    field :currency, :string, default: nil
     timestamps()
   end
 
@@ -64,7 +68,10 @@ defmodule QuickcourtBackend.Court.Claim do
       :agreement_type_issue,
       :circumstance_invoked,
       :first_resolution,
-      :second_resolution
+      :second_resolution,
+      :claim_for_money,
+      :amount,
+      :currency
     ])
     |> validate_required([:claimant_country_id, :defendant_country_id])
     |> fields_not_equal(:claimant_country_id, :defendant_country_id)

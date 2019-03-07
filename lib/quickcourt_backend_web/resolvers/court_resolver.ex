@@ -7,14 +7,24 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     {:ok, claims}
   end
 
-  def create_claim(_root, args, _info) do
+  def create_claim(_root, args, info) do
     case Court.create_claim(args) do
       {:ok, claim} ->
         try do
-          generated_pdf = ClaimPdfGenerator.generate_pdf(claim)
-          {:ok, Map.merge(Map.from_struct(claim), %{pdf_base64: generated_pdf})}
+          # IO.puts "INFO:"
+          # IO.inspect info
+
+          generated_pdf_small_claim_form = ClaimPdfGenerator.generate_small_claim_form_pdf(claim)
+          generated_pdf_epo_a = ClaimPdfGenerator.generate_epo_a_pdf(claim)
+          generated_pdf_warning_letter = ClaimPdfGenerator.generate_warning_letter_pdf(claim)
+
+          result = Map.from_struct(claim)
+          |> Map.merge(%{pdf_base64_small_claim_form: generated_pdf_small_claim_form})
+          |> Map.merge(%{pdf_base64_epo_a: generated_pdf_epo_a})
+          |> Map.merge(%{pdf_base64_warning_letter: generated_pdf_warning_letter})
+          {:ok, result}
         rescue
-          RuntimeError -> {:error, "There was an error generating PDF document"}
+          RuntimeError -> {:error, "There was an error generating PDF document(s)"}
         end
 
       {:error, errors} ->
