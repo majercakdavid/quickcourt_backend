@@ -135,11 +135,11 @@ defmodule QuickcourtBackendWeb.Schema do
       arg(:agreement_type, non_null(:string))
       arg(:agreement_type_issue, non_null(:string))
       arg(:circumstance_invoked, non_null(:string))
-      
+
       arg(:first_resolution, non_null(:string))
-      
+
       arg(:second_resolution, non_null(:string))
-      
+
       arg(:purchase_place, :string)
       arg(:purchase_date, non_null(:datetime))
       arg(:delivery_place, :string)

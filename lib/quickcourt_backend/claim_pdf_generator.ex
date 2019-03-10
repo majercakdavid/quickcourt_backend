@@ -13,7 +13,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
       Base.encode64(file_contents)
     rescue
       e ->
-        IO.puts "ERROR GENERATING PDF"
+        IO.puts("ERROR GENERATING PDF")
         IO.inspect(e)
         throw(e)
     end
@@ -31,7 +31,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
       Base.encode64(file_contents)
     rescue
       e ->
-        IO.puts "ERROR GENERATING PDF"
+        IO.puts("ERROR GENERATING PDF")
         IO.inspect(e)
         throw(e)
     end
@@ -49,7 +49,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
       Base.encode64(file_contents)
     rescue
       e ->
-        IO.puts "ERROR GENERATING PDF"
+        IO.puts("ERROR GENERATING PDF")
         IO.inspect(e)
         throw(e)
     end
@@ -57,18 +57,18 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
 
   defp claim_to_list(claim) do
     Map.from_struct(claim)
-      |> Enum.filter(fn {k, v} ->
-        !Enum.member?(["__meta__", "inserted_at", "updated_at"], Atom.to_string(k)) && v != nil
-      end)
-      |> Enum.map(fn {k, v} ->
-        new_value =
-          case v do
-            %DateTime{} -> to_string(v)
-            %{} -> to_string(v.name)
-            val -> to_string(val)
-          end
+    |> Enum.filter(fn {k, v} ->
+      !Enum.member?(["__meta__", "inserted_at", "updated_at"], Atom.to_string(k)) && v != nil
+    end)
+    |> Enum.map(fn {k, v} ->
+      new_value =
+        case v do
+          %DateTime{} -> to_string(v)
+          %{} -> to_string(v.name)
+          val -> to_string(val)
+        end
 
-        {k, new_value}
-      end)
+      {k, new_value}
+    end)
   end
 end
