@@ -13,9 +13,9 @@ config :quickcourt_backend, QuickcourtBackendWeb.Endpoint,
 
 # Configure your database
 config :quickcourt_backend, QuickcourtBackend.Repo,
-  username: "srizyaiskfqifx",
-  password: "125666a9138175941bd2fe8eeca5d399606c28e68d7f9aea9483eafcd72e9ba3",
-  database: "dcb1q9nkrg293l",
+  username: "mjtluxjpsdxmul",
+  password: "a00c70afebf84b30517e60b3db70468e8dca4522a5783e7dbaf12bc7fdb75234",
+  database: "dej4jdn2h068c1",
   hostname: "ec2-54-247-70-127.eu-west-1.compute.amazonaws.com",
   pool_size: 10,
   port: "5432",
