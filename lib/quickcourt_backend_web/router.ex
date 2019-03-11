@@ -2,7 +2,7 @@ defmodule QuickcourtBackendWeb.Router do
   use QuickcourtBackendWeb, :router
 
   pipeline :api do
-    plug CORSPlug, origin: "https://qc-web-app-demo.herokuapp.com/"
+    plug CORSPlug, origin: "*"
     plug :accepts, ["json"]
   end
 
