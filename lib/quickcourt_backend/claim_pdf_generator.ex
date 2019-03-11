@@ -8,7 +8,6 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
     try do
       {:ok, filename} =
         PdfGenerator.generate(html, page_size: "A4", shell_params: ["--dpi", "300"], command_prefix: "xvfb-run" )
-
       {:ok, file_contents} = File.read(filename)
       Base.encode64(file_contents)
     rescue
