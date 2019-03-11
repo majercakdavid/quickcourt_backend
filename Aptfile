@@ -1,4 +1,3 @@
 wkhtmltopdf 
-pdftk 
-xvfb 
+pdftk
 libfontconfig
