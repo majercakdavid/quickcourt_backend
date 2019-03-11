@@ -49,7 +49,8 @@ defmodule QuickcourtBackend.MixProject do
       {:pdf2htmlex, "~> 0.1"},
       {:pdf_generator, ">=0.4.0"},
       {:sneeze, "~> 1.1"},
-      {:csv, "~> 2.2"}
+      {:csv, "~> 2.2"},
+      {:cors_plug, "~> 1.5"}
     ]
   end
 
