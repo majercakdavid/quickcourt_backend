@@ -4,7 +4,6 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
   def generate_small_claim_form_pdf(claim) do
     claim_list = claim_to_list(claim)
     html = EEx.eval_file("./assets/53C.1-European_Small_Claims_Form_A.html", claim_list)
-
     try do
       {:ok, filename} =
         PdfGenerator.generate(html, page_size: "A4", shell_params: ["--dpi", "300"], command_prefix: "xvfb-run" )
