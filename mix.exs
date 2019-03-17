@@ -50,7 +50,8 @@ defmodule QuickcourtBackend.MixProject do
       {:pdf_generator, ">=0.4.0"},
       {:sneeze, "~> 1.1"},
       {:csv, "~> 2.2"},
-      {:cors_plug, "~> 1.5"}
+      {:cors_plug, "~> 1.5"},
+      {:distillery, "~> 1.4"}
     ]
   end
 
