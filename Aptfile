@@ -1,5 +1,0 @@
-wkhtmltopdf 
-pdftk
-xvfb
-libfontconfig
-libnotify4

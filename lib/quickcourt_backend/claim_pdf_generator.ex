@@ -3,7 +3,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
 
   def generate_small_claim_form_pdf(claim) do
     claim_list = claim_to_list(claim)
-    html = EEx.eval_file("./assets/53C.1-European_Small_Claims_Form_A.html", claim_list)
+    html = EEx.eval_file(Application.app_dir(:quickcourt_backend, "priv/templates/53C.1-European_Small_Claims_Form_A.html"), claim_list)
     try do
       {:ok, filename} =
         PdfGenerator.generate(html, page_size: "A4", shell_params: ["--dpi", "300"], command_prefix: "xvfb-run" )
@@ -20,7 +20,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
 
   def generate_epo_a_pdf(claim) do
     claim_list = claim_to_list(claim)
-    html = EEx.eval_file("./assets/EPO_A_29072017_en.html", claim_list)
+    html = EEx.eval_file(Application.app_dir(:quickcourt_backend, "priv/templates/EPO_A_29072017_en.html"), claim_list)
 
     try do
       {:ok, filename} =
@@ -38,7 +38,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
 
   def generate_warning_letter_pdf(claim) do
     claim_list = claim_to_list(claim)
-    html = EEx.eval_file("./assets/warning_letter_template.html", claim_list)
+    html = EEx.eval_file(Application.app_dir(:quickcourt_backend, "priv/templates/warning_letter_template.html"), claim_list)
 
     try do
       {:ok, filename} =
