@@ -62,7 +62,9 @@ defmodule QuickcourtBackend.Court do
         preloaded_claim =
           Repo.preload(claim, [
             :claimant_country,
-            :defendant_country
+            :defendant_country,
+            :purchase_country,
+            :delivery_country
           ])
 
         {:ok, preloaded_claim}

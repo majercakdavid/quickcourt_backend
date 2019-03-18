@@ -27,9 +27,9 @@ defmodule QuickcourtBackend.Court.Claim do
     field :circumstance_invoked, :string
     field :first_resolution, :string
     field :second_resolution, :string
-    field :purchase_place, :string, default: "online"
+    belongs_to :purchase_country, Country
     field :purchase_date, :utc_datetime
-    field :delivery_place, :string, default: "online"
+    belongs_to :delivery_country, Country
     field :delivery_date, :utc_datetime
     field :lack_discovery_date, :utc_datetime
 
@@ -57,9 +57,9 @@ defmodule QuickcourtBackend.Court.Claim do
       :defendant_zip,
       :claimant_address,
       :defendant_address,
-      :purchase_place,
+      :purchase_country_id,
       :purchase_date,
-      :delivery_place,
+      :delivery_country_id,
       :delivery_date,
       :lack_discovery_date,
       :claimant_country_id,
@@ -73,10 +73,12 @@ defmodule QuickcourtBackend.Court.Claim do
       :amount,
       :currency
     ])
-    |> validate_required([:claimant_country_id, :defendant_country_id])
+    |> validate_required([:claimant_country_id, :defendant_country_id, :purchase_country_id, :delivery_country_id])
     |> fields_not_equal(:claimant_country_id, :defendant_country_id)
     |> foreign_key_constraint(:claimant_country_id)
     |> foreign_key_constraint(:defendant_country_id)
+    |> foreign_key_constraint(:purchase_country_id)
+    |> foreign_key_constraint(:delivery_country_id)
     |> validate_required([:is_business])
   end
 

@@ -11,9 +11,6 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     case Court.create_claim(args) do
       {:ok, claim} ->
         try do
-          # IO.puts "INFO:"
-          # IO.inspect info
-
           generated_pdf_small_claim_form = ClaimPdfGenerator.generate_small_claim_form_pdf(claim)
           generated_pdf_epo_a = ClaimPdfGenerator.generate_epo_a_pdf(claim)
           generated_pdf_warning_letter = ClaimPdfGenerator.generate_warning_letter_pdf(claim)

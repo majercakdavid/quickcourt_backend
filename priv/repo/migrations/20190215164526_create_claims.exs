@@ -25,9 +25,9 @@ defmodule QuickcourtBackend.Repo.Migrations.CreateClaims do
       add :circumstance_invoked, :string
       add :first_resolution, :string
       add :second_resolution, :string
-      add :purchase_place, :string, default: "online"
+      add :purchase_country_id, references(:countries), default: nil
       add :purchase_date, :utc_datetime
-      add :delivery_place, :string, default: "online"
+      add :delivery_country_id, references(:countries), default: nil
       add :delivery_date, :utc_datetime
       add :lack_discovery_date, :utc_datetime
 
