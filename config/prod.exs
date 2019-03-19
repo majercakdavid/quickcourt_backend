@@ -25,6 +25,19 @@ config :quickcourt_backend, QuickcourtBackendWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
+config :quickcourt_backend, QuickcourtBackendWeb.Endpoint,
+  secret_key_base: {:system, "SECRET_KEY_BASE"}
+
+# Configure your database
+config :quickcourt_backend, QuickcourtBackend.Repo,
+  username: {:system, "DATABASE_USERNAME"},
+  password: {:system, "DATABASE_PASSWORD"},
+  database: {:system, "DATABASE_NAME"},
+  hostname: {:system, "DATABASE_HOSTNAME"},
+  pool_size: 4,
+  port: "5432",
+  ssl: true
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key
