@@ -10,18 +10,19 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 
-#port = {:system, "PORT"} || 80
-#IO.puts "Application running on port: " <> Integer.to_string(port)
+# port = {:system, "PORT"} || 80
+# IO.puts "Application running on port: " <> Integer.to_string(port)
 
 config :quickcourt_backend, QuickcourtBackendWeb.Endpoint,
   secret_key_base: {:system, "SECRET_KEY_BASE"},
-  http: [port:  {:system, "PORT"}],
+  http: [port: {:system, "PORT"}],
   # url: [host: "lit-plateau-83253.herokuapp.com", port: 80],
-  url: [host:  {:system, "HOST"}, port: 80],
+  url: [host: {:system, "HOST"}, port: 80],
   root: ".",
   server: true
-  #force_ssl: [rewrite_on: [:x_forwarded_proto]],
-  #cache_static_manifest: "priv/static/cache_manifest.json"
+
+# force_ssl: [rewrite_on: [:x_forwarded_proto]],
+# cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
 # config :logger, level: :info
@@ -29,9 +30,9 @@ config :logger, :console, format: "[$level] $message\n"
 
 # Configure your database
 config :quickcourt_backend, QuickcourtBackend.Repo,
-  username: System.get_env "DATABASE_USERNAME",
-  password: System.get_env "DATABASE_PASSWORD",
-  database: System.get_env "DATABASE_NAME",
+  username: System.get_env("DATABASE_USERNAME"),
+  password: System.get_env("DATABASE_PASSWORD"),
+  database: System.get_env("DATABASE_NAME"),
   hostname: "manny.db.elephantsql.com",
   pool_size: 4,
   port: "5432",
