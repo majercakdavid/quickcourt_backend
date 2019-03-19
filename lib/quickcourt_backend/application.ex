@@ -7,11 +7,11 @@ defmodule QuickcourtBackend.Application do
   require Logger
 
   def start(_type, _args) do
-    IO.puts "ENV:"
-    IO.inspect System.get_env
-
     Logger.info "ENV:"
-    Logger.info System.get_env
+    Logger.info System.get_env "DATABASE_USERNAME"
+    Logger.info System.get_env "DATABASE_PASSWORD"
+    Logger.info System.get_env "DATABASE_NAME"
+    Logger.info System.get_env "DATABASE_HOSTNAME"
 
     # List all child processes to be supervised
     children = [
