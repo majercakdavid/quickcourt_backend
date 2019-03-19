@@ -4,8 +4,15 @@ defmodule QuickcourtBackend.Application do
   @moduledoc false
 
   use Application
+  require Logger
 
   def start(_type, _args) do
+    IO.puts "ENV:"
+    IO.inspect System.get_env
+
+    Logger.info "ENV:"
+    Logger.info System.get_env
+
     # List all child processes to be supervised
     children = [
       # Start the Ecto repository
