@@ -36,7 +36,7 @@ config :quickcourt_backend, QuickcourtBackend.Repo,
   pool_size: 4,
   port: "5432",
   ssl: true,
-  :show_sensitive_data_on_connection_error
+  show_sensitive_data_on_connection_error: true
 
 # ## SSL Support
 #
