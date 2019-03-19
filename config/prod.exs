@@ -14,6 +14,7 @@ use Mix.Config
 #IO.puts "Application running on port: " <> Integer.to_string(port)
 
 config :quickcourt_backend, QuickcourtBackendWeb.Endpoint,
+  secret_key_base: {:system, "SECRET_KEY_BASE"},
   http: [port:  {:system, "PORT"}],
   # url: [host: "lit-plateau-83253.herokuapp.com", port: 80],
   url: [host:  {:system, "HOST"}, port: 80],
@@ -26,9 +27,6 @@ config :quickcourt_backend, QuickcourtBackendWeb.Endpoint,
 # config :logger, level: :info
 config :logger, :console, format: "[$level] $message\n"
 
-config :quickcourt_backend, QuickcourtBackendWeb.Endpoint,
-  secret_key_base: {:system, "SECRET_KEY_BASE"}
-
 # Configure your database
 config :quickcourt_backend, QuickcourtBackend.Repo,
   username: {:system, "DATABASE_USERNAME"},
@@ -37,7 +35,8 @@ config :quickcourt_backend, QuickcourtBackend.Repo,
   hostname: {:system, "DATABASE_HOSTNAME"},
   pool_size: 4,
   port: "5432",
-  ssl: true
+  ssl: true,
+  :show_sensitive_data_on_connection_error
 
 # ## SSL Support
 #
