@@ -29,9 +29,9 @@ config :logger, :console, format: "[$level] $message\n"
 
 # Configure your database
 config :quickcourt_backend, QuickcourtBackend.Repo,
-  username: {:system, "DATABASE_USERNAME"},
-  password: {:system, "DATABASE_PASSWORD"},
-  database: {:system, "DATABASE_NAME"},
+  username: System.get_env "DATABASE_USERNAME",
+  password: System.get_env "DATABASE_PASSWORD",
+  database: System.get_env "DATABASE_NAME",
   hostname: "manny.db.elephantsql.com",
   pool_size: 4,
   port: "5432",
