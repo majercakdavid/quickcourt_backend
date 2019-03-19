@@ -265,6 +265,8 @@ defmodule QuickcourtBackend.Court do
       )
 
     claim_rules
+    # If the second resolution is missing print out empty array instead of values set to nil
+    |> Enum.filter(fn claim_rule -> claim_rule.second_resolution != nil end)
     |> Enum.map(fn claim_rule ->
       %{
         label: claim_rule.second_resolution,
