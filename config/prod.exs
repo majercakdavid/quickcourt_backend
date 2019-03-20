@@ -32,7 +32,7 @@ config :logger, :console, format: "[$level] $message\n"
 config :quickcourt_backend, QuickcourtBackend.Repo,
   username: System.get_env("DATABASE_USERNAME"),
   password: System.get_env("DATABASE_PASSWORD"),
-  database: System.get_env("DATABASE_NAME"),
+  database: "jvpehqwm",
   hostname: "manny.db.elephantsql.com",
   pool_size: 4,
   port: "5432",
