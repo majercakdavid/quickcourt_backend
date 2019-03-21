@@ -25,19 +25,17 @@ config :quickcourt_backend, QuickcourtBackendWeb.Endpoint,
 # cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Do not print debug messages in production
-# config :logger, level: :info
-config :logger, :console, format: "[$level] $message\n"
+config :logger, level: :info
 
 # Configure your database
 config :quickcourt_backend, QuickcourtBackend.Repo,
   username: "${DATABASE_USERNAME}",
   password: "${DATABASE_PASSWORD}",
-  database: "jvpehqwm",
-  hostname: "manny.db.elephantsql.com",
+  database: "${DATABASE_NAME}",
+  hostname: "${DATABASE_HOSTNAME}",
   pool_size: 4,
-  port: "5432",
-  ssl: true,
-  show_sensitive_data_on_connection_error: true
+  port: "${DATABASE_PORT}",
+  ssl: true
 
 # ## SSL Support
 #
