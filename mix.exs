@@ -51,7 +51,10 @@ defmodule QuickcourtBackend.MixProject do
       {:sneeze, "~> 1.1"},
       {:csv, "~> 2.2"},
       {:cors_plug, "~> 1.5"},
-      {:distillery, "~> 1.4"}
+      {:distillery, "~> 1.4"},
+      {:comeonin, "~> 5.1"},
+      {:argon2_elixir, "~> 2.0"},
+      {:guardian, "~> 1.0"}
     ]
   end
 
