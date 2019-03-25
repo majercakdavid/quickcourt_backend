@@ -73,7 +73,12 @@ defmodule QuickcourtBackend.Court.Claim do
       :amount,
       :currency
     ])
-    |> validate_required([:claimant_country_id, :defendant_country_id, :purchase_country_id, :delivery_country_id])
+    |> validate_required([
+      :claimant_country_id,
+      :defendant_country_id,
+      :purchase_country_id,
+      :delivery_country_id
+    ])
     |> fields_not_equal(:claimant_country_id, :defendant_country_id)
     |> foreign_key_constraint(:claimant_country_id)
     |> foreign_key_constraint(:defendant_country_id)

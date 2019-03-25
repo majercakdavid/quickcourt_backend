@@ -3,7 +3,9 @@ defmodule QuickcourtBackendWeb.Schema do
 
   alias QuickcourtBackendWeb.SharedResolver
   alias QuickcourtBackendWeb.CourtResolver
+  alias QuickcourtBackendWeb.UserResolver
 
+  import_types(QuickcourtBackendWeb.Schema.Types)
   import_types(Absinthe.Type.Custom)
 
   object :enumeration do
@@ -51,7 +53,7 @@ defmodule QuickcourtBackendWeb.Schema do
     field :defendant_city, non_null(:string)
     field :claimant_zip, non_null(:string)
     field :defendant_zip, non_null(:string)
-    field :claimant_country, non_null(:string) 
+    field :claimant_country, non_null(:string)
     field :defendant_country, non_null(:string)
     field :claimant_address, non_null(:string)
     field :defendant_address, non_null(:string)
@@ -80,6 +82,11 @@ defmodule QuickcourtBackendWeb.Schema do
   end
 
   query do
+    @desc "Get list of all users"
+    field :users, list_of(:user_type) do
+      resolve(&UserResolver.all_users/3)
+    end
+
     field :countries, list_of(:enumeration) do
       resolve(&SharedResolver.all_countries/3)
     end
@@ -115,6 +122,18 @@ defmodule QuickcourtBackendWeb.Schema do
   end
 
   mutation do
+    @desc "Register a new user"
+    field :register_user, type: :user_type do
+      arg(:input, non_null(:user_input_type))
+      resolve(&UserResolver.register_user/3)
+    end
+
+    @desc "Login user and return a jwt token"
+    field :login_user, type: :session_type do
+      arg(:input, non_null(:session_input_type))
+      resolve(&UserResolver.login_user/3)
+    end
+
     field :create_claim, :claim do
       arg(:is_business, non_null(:boolean))
       arg(:claimant_name, non_null(:string))
