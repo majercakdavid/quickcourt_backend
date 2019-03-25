@@ -35,6 +35,8 @@ RUN apt-get update && \
   mix local.rebar --force && \
   mix local.hex --force
 
+RUN apt-get -y install build-essential
+
 # This copies our app source code into the build container
 COPY . .
 
