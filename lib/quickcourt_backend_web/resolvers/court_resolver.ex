@@ -2,13 +2,18 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   alias QuickcourtBackend.Court
   alias QuickcourtBackend.ClaimPdfGenerator
 
+  @type user_context() :: %{current_user: Auth.User}
+
   def all_claims(_root, _args, _info) do
     claims = Court.list_claims()
     {:ok, claims}
   end
 
-  def create_claim(_root, args, _info) do
-    case Court.create_claim(args) do
+  @spec create_claim(any(), any(), user_context()) :: any()
+  def create_claim(_root, args, %{context: %{current_user: user}}) do
+    case args 
+    |> Map.merge(%{user_id: user.id})
+    |> Court.create_claim do
       {:ok, claim} ->
         try do
           generated_pdf_small_claim_form = ClaimPdfGenerator.generate_small_claim_form_pdf(claim)

@@ -93,6 +93,12 @@ defmodule QuickcourtBackendWeb.Schema do
       resolve(&UserResolver.all_users/3)
     end
 
+    @desc "Get the user profile"
+    field :profile, :user_type do
+      middleware(Middleware.Authorize, :any)
+      resolve(&UserResolver.get_user/3)
+    end
+
     field :countries, non_null(list_of(non_null(:enumeration))) do
       resolve(&SharedResolver.all_countries/3)
     end
@@ -141,6 +147,8 @@ defmodule QuickcourtBackendWeb.Schema do
     end
 
     field :create_claim, :claim do
+      middleware(Middleware.Authorize, :any)
+      
       arg(:is_business, non_null(:boolean))
       arg(:claimant_name, non_null(:string))
       arg(:claimant_surname, non_null(:string))
