@@ -93,33 +93,33 @@ defmodule QuickcourtBackendWeb.Schema do
       resolve(&UserResolver.all_users/3)
     end
 
-    field :countries, non_null(list_of(:enumeration)) do
+    field :countries, non_null(list_of(non_null(:enumeration))) do
       resolve(&SharedResolver.all_countries/3)
     end
 
-    field :agreement_types, non_null(list_of(:agreement_type)) do
+    field :agreement_types, non_null(list_of(non_null(:agreement_type))) do
       resolve(&CourtResolver.all_agreement_types/3)
     end
 
-    field :agreement_type_issues, non_null(list_of(:agreement_type_issue)) do
+    field :agreement_type_issues, non_null(list_of(non_null(:agreement_type_issue))) do
       arg(:agreement_type, non_null(:string))
       resolve(&CourtResolver.all_agreement_type_issues/3)
     end
 
-    field :circumstances_invoked, non_null(list_of(:circumstances_invoked)) do
+    field :circumstances_invoked, non_null(list_of(non_null(:circumstances_invoked))) do
       arg(:agreement_type, non_null(:string))
       arg(:agreement_type_issue, non_null(:string))
       resolve(&CourtResolver.all_circumstances_invoked/3)
     end
 
-    field :first_resolutions, non_null(list_of(:resolution)) do
+    field :first_resolutions, non_null(list_of(non_null(:resolution))) do
       arg(:agreement_type, non_null(:string))
       arg(:agreement_type_issue, non_null(:string))
       arg(:circumstance_invoked, non_null(:string))
       resolve(&CourtResolver.all_first_resolutions/3)
     end
 
-    field :second_resolutions, non_null(list_of(:resolution)) do
+    field :second_resolutions, non_null(list_of(non_null(:resolution))) do
       arg(:agreement_type, non_null(:string))
       arg(:agreement_type_issue, non_null(:string))
       arg(:circumstance_invoked, non_null(:string))
