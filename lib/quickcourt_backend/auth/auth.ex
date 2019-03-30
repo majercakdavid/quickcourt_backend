@@ -128,7 +128,7 @@ defmodule QuickcourtBackend.Auth do
 
   defp check_user_password(user, args) do
     case user do
-      nil -> Comeonin.Argon2.dummy_checkpw()
+      nil -> Argon2.no_user_verify()
       _ -> Argon2.verify_pass(args.password, user.password_hash)
     end
   end
