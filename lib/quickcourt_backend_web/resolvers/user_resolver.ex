@@ -15,8 +15,8 @@ defmodule QuickcourtBackendWeb.UserResolver do
 
   def register_user(_root, %{input: input}, _info) do
     case Auth.create_user(input) do
-      {:ok, user} ->
-        {:ok, user}
+      {:ok, _} ->
+        perform_login(%{email: input.email, password: input.password})
 
       {:error, %{errors: errors}} ->
         {:error, normalize_errors(errors)}
@@ -27,7 +27,11 @@ defmodule QuickcourtBackendWeb.UserResolver do
   end
 
   def login_user(_root, %{input: input}, _info) do
-    case Auth.login_user(input) do
+    perform_login(input)
+  end
+
+  defp perform_login(args) do
+    case Auth.login_user(args) do
       {:ok, result} ->
         {:ok, result}
 
