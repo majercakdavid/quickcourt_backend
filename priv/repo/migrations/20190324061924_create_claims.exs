@@ -38,6 +38,8 @@ defmodule QuickcourtBackend.Repo.Migrations.CreateClaims do
       add :amount, :float, default: nil
       add :currency, :string, default: nil
 
+      add :user_id, references(:users)
+
       timestamps()
     end
   end

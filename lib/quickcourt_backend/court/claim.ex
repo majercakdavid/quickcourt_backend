@@ -3,6 +3,7 @@ defmodule QuickcourtBackend.Court.Claim do
   import Ecto.Changeset
 
   alias QuickcourtBackend.Shared.Country
+  alias QuickcourtBackend.Auth.User
 
   schema "claims" do
     field :case_number, :string
@@ -39,6 +40,8 @@ defmodule QuickcourtBackend.Court.Claim do
     field :claim_for_money, :boolean, default: false
     field :amount, :float, default: nil
     field :currency, :string, default: nil
+
+    belongs_to :user, User
     timestamps()
   end
 
@@ -76,7 +79,8 @@ defmodule QuickcourtBackend.Court.Claim do
       :spieces_description,
       :claim_for_money,
       :amount,
-      :currency
+      :currency,
+      :user_id
     ])
     |> validate_required([
       :is_business,
@@ -107,13 +111,15 @@ defmodule QuickcourtBackend.Court.Claim do
       :genus_description,
       :claim_for_money,
       :amount,
-      :currency
+      :currency,
+      :user_id
     ])
     |> fields_not_equal(:claimant_country_id, :defendant_country_id)
     |> foreign_key_constraint(:claimant_country_id)
     |> foreign_key_constraint(:defendant_country_id)
     |> foreign_key_constraint(:purchase_country_id)
     |> foreign_key_constraint(:delivery_country_id)
+    |> foreign_key_constraint(:user_id)
     |> validate_required([:is_business])
   end
 
