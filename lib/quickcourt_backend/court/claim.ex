@@ -33,6 +33,9 @@ defmodule QuickcourtBackend.Court.Claim do
     field :delivery_date, :utc_datetime
     field :lack_discovery_date, :utc_datetime
 
+    field :genus_description, :string
+    field :spieces_description, :string
+
     field :claim_for_money, :boolean, default: false
     field :amount, :float, default: nil
     field :currency, :string, default: nil
@@ -69,15 +72,42 @@ defmodule QuickcourtBackend.Court.Claim do
       :circumstance_invoked,
       :first_resolution,
       :second_resolution,
+      :genus_description,
+      :spieces_description,
       :claim_for_money,
       :amount,
       :currency
     ])
     |> validate_required([
+      :is_business,
+      :claimant_email,
+      :defendant_email,
+      :claimant_phone,
+      :defendant_phone,
+      :claimant_name,
+      :claimant_surname,
+      :defendant_company_name,
+      :claimant_city,
+      :defendant_city,
+      :claimant_zip,
+      :defendant_zip,
+      :claimant_address,
+      :defendant_address,
+      :purchase_country_id,
+      :purchase_date,
+      :delivery_country_id,
+      :delivery_date,
+      :lack_discovery_date,
       :claimant_country_id,
       :defendant_country_id,
-      :purchase_country_id,
-      :delivery_country_id
+      :agreement_type,
+      :agreement_type_issue,
+      :circumstance_invoked,
+      :first_resolution,
+      :genus_description,
+      :claim_for_money,
+      :amount,
+      :currency
     ])
     |> fields_not_equal(:claimant_country_id, :defendant_country_id)
     |> foreign_key_constraint(:claimant_country_id)

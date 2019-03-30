@@ -31,6 +31,9 @@ defmodule QuickcourtBackend.Repo.Migrations.CreateClaims do
       add :delivery_date, :utc_datetime
       add :lack_discovery_date, :utc_datetime
 
+      add :genus_description, :text
+      add :spieces_description, :text
+
       add :claim_for_money, :boolean, default: false
       add :amount, :float, default: nil
       add :currency, :string, default: nil
