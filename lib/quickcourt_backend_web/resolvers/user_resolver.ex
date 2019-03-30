@@ -1,5 +1,5 @@
 defmodule QuickcourtBackendWeb.UserResolver do
-  alias QuickcourtBackend.{Auth, Guardian}
+  alias QuickcourtBackend.Auth
 
   @type user_context() :: %{current_user: Auth.User}
 
@@ -14,13 +14,28 @@ defmodule QuickcourtBackendWeb.UserResolver do
   end
 
   def register_user(_root, %{input: input}, _info) do
-    Auth.create_user(input)
+    case Auth.create_user(input) do
+      {:ok, user} ->
+        {:ok, user}
+
+      {:error, %{errors: errors}} ->
+        {:error, normalize_errors(errors)}
+    end
   end
 
   def login_user(_root, %{input: input}, _info) do
-    with {:ok, user} <- Auth.authenticate_user(input),
-         {:ok, jwt_token, _} <- Guardian.encode_and_sign(user) do
-      {:ok, %{token: jwt_token, user: user}}
+    case Auth.login_user(input) do
+      {:ok, result} ->
+        {:ok, result}
+
+      {:error, %{errors: errors}} ->
+        {:error, normalize_errors(errors)}
     end
+  end
+
+  defp normalize_errors(args) do
+    args
+    |> Enum.map(fn {key, {message, _}} -> {key, message} end)
+    |> inspect
   end
 end

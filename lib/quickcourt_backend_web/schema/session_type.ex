@@ -3,7 +3,7 @@ defmodule QuickcourtBackendWeb.Schema.Types.SessionType do
 
   object :session_type do
     field(:token, non_null(:string))
-    field(:user, :user_type)
+    field(:user, non_null(:user_type))
   end
 
   input_object :session_input_type do

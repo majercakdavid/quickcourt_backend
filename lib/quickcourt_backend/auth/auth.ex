@@ -7,6 +7,7 @@ defmodule QuickcourtBackend.Auth do
   alias QuickcourtBackend.Repo
 
   alias QuickcourtBackend.Auth.User
+  alias QuickcourtBackend.Guardian
 
   @doc """
   Returns the list of users.
@@ -105,7 +106,14 @@ defmodule QuickcourtBackend.Auth do
   @doc """
   Authenticate the user to access other resources within the application
   """
-  def authenticate_user(args) do
+  def login_user(args) do
+    with {:ok, user} <- authenticate_user(args),
+         {:ok, jwt_token, _} <- Guardian.encode_and_sign(user) do
+      {:ok, %{token: jwt_token, user: user}}
+    end
+  end
+
+  defp authenticate_user(args) do
     user = Repo.get_by(User, email: String.downcase(args.email))
     result = check_user_password(user, args)
 
