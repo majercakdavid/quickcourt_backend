@@ -135,7 +135,7 @@ defmodule QuickcourtBackendWeb.Schema do
 
   mutation do
     @desc "Register a new user"
-    field :register_user, type: non_null(:user_type) do
+    field :register_user, type: non_null(:session_type) do
       arg(:input, non_null(:user_input_type))
       resolve(&UserResolver.register_user/3)
     end
