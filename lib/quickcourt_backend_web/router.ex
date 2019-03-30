@@ -4,6 +4,7 @@ defmodule QuickcourtBackendWeb.Router do
   pipeline :api do
     plug CORSPlug, origin: "*"
     plug :accepts, ["json"]
+    plug(QuickcourtBackendWeb.Plugs.Context)
   end
 
   scope "/" do
@@ -21,7 +22,7 @@ defmodule QuickcourtBackendWeb.Router do
 
     forward "/graphiql", Absinthe.Plug.GraphiQL,
       schema: QuickcourtBackendWeb.Schema,
-      interface: :simple,
+      interface: :advanced,
       context: %{pubsub: QuickcourtBackendWeb.Endpoint}
   end
 end

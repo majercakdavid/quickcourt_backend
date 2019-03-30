@@ -40,7 +40,7 @@ end
 # Guardian config details
 # to generate secrete run: mix guardian.gen.secret
 config :quickcourt_backend, QuickcourtBackend.Guardian,
-       issuer: "quickcourt_backend",
-       secret_key: "ToPI7ruKGB3nQmfn4QeDiFsgbofgFwBY4Ea0EcdzL9W0k123eAXyKbS8KDO0vILs"
+  issuer: "quickcourt_backend",
+  secret_key: "ToPI7ruKGB3nQmfn4QeDiFsgbofgFwBY4Ea0EcdzL9W0k123eAXyKbS8KDO0vILs"
 
 config :porcelain, driver: Porcelain.Driver.Basic

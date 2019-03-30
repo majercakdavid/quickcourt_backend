@@ -1,6 +1,8 @@
 defmodule QuickcourtBackendWeb.Schema do
   use Absinthe.Schema
 
+  alias QuickcourtBackendWeb.Schema.Middleware
+
   alias QuickcourtBackendWeb.SharedResolver
   alias QuickcourtBackendWeb.CourtResolver
   alias QuickcourtBackendWeb.UserResolver
@@ -72,6 +74,9 @@ defmodule QuickcourtBackendWeb.Schema do
     field :delivery_date, non_null(:datetime)
     field :lack_discovery_date, non_null(:datetime)
 
+    field :genus_description, non_null(:string)
+    field :spieces_description, non_null(:string)
+
     field :claim_for_money, non_null(:boolean)
     field :amount, non_null(:float)
     field :currency, non_null(:string)
@@ -84,6 +89,7 @@ defmodule QuickcourtBackendWeb.Schema do
   query do
     @desc "Get list of all users"
     field :users, list_of(:user_type) do
+      middleware(Middleware.Authorize, 1)
       resolve(&UserResolver.all_users/3)
     end
 
@@ -154,16 +160,18 @@ defmodule QuickcourtBackendWeb.Schema do
       arg(:agreement_type, non_null(:string))
       arg(:agreement_type_issue, non_null(:string))
       arg(:circumstance_invoked, non_null(:string))
-
+      
       arg(:first_resolution, non_null(:string))
-
-      arg(:second_resolution, non_null(:string))
+      arg(:second_resolution, :string)
 
       arg(:purchase_country_id, :integer)
       arg(:purchase_date, non_null(:datetime))
       arg(:delivery_country_id, :integer)
       arg(:delivery_date, non_null(:datetime))
       arg(:lack_discovery_date, non_null(:datetime))
+
+      arg(:genus_description, non_null(:string))
+      arg(:spieces_description, non_null(:string))
 
       arg(:claim_for_money, non_null(:boolean))
       arg(:amount, non_null(:float))
