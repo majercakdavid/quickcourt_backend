@@ -20,6 +20,9 @@ defmodule QuickcourtBackendWeb.UserResolver do
 
       {:error, %{errors: errors}} ->
         {:error, normalize_errors(errors)}
+
+      {:error, message} ->
+        {:error, [message]}
     end
   end
 
@@ -30,12 +33,14 @@ defmodule QuickcourtBackendWeb.UserResolver do
 
       {:error, %{errors: errors}} ->
         {:error, normalize_errors(errors)}
+
+      {:error, message} ->
+        {:error, [message]}
     end
   end
 
   defp normalize_errors(args) do
     args
-    |> Enum.map(fn {key, {message, _}} -> {key, message} end)
-    |> inspect
+    |> Enum.map(fn {key, {message, _}} -> Atom.to_string(key) <> " " <> message end)
   end
 end
