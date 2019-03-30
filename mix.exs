@@ -68,7 +68,7 @@ defmodule QuickcourtBackend.MixProject do
     [
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate", "test"]
+      test: ["ecto.drop", "ecto.setup", "run test/test_seeds.exs", "test"]
     ]
   end
 end

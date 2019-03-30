@@ -161,4 +161,66 @@ defmodule QuickcourtBackend.CourtTest do
       assert %Ecto.Changeset{} = Court.change_claim_rule(claim_rule)
     end
   end
+
+  describe "claim_statuses" do
+    alias QuickcourtBackend.Court.ClaimStatus
+
+    @valid_attrs %{label: "some label"}
+    @update_attrs %{label: "some updated label"}
+    @invalid_attrs %{label: nil}
+
+    def claim_status_fixture(attrs \\ %{}) do
+      {:ok, claim_status} =
+        attrs
+        |> Enum.into(@valid_attrs)
+        |> Court.create_claim_status()
+
+      claim_status
+    end
+
+    test "list_claim_statuses/0 returns all claim_statuses" do
+      claim_status = claim_status_fixture()
+      assert Court.list_claim_statuses() == [claim_status]
+    end
+
+    test "get_claim_status!/1 returns the claim_status with given id" do
+      claim_status = claim_status_fixture()
+      assert Court.get_claim_status!(claim_status.id) == claim_status
+    end
+
+    test "create_claim_status/1 with valid data creates a claim_status" do
+      assert {:ok, %ClaimStatus{} = claim_status} = Court.create_claim_status(@valid_attrs)
+      assert claim_status.label == "some label"
+    end
+
+    test "create_claim_status/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Court.create_claim_status(@invalid_attrs)
+    end
+
+    test "update_claim_status/2 with valid data updates the claim_status" do
+      claim_status = claim_status_fixture()
+
+      assert {:ok, %ClaimStatus{} = claim_status} =
+               Court.update_claim_status(claim_status, @update_attrs)
+
+      assert claim_status.label == "some updated label"
+    end
+
+    test "update_claim_status/2 with invalid data returns error changeset" do
+      claim_status = claim_status_fixture()
+      assert {:error, %Ecto.Changeset{}} = Court.update_claim_status(claim_status, @invalid_attrs)
+      assert claim_status == Court.get_claim_status!(claim_status.id)
+    end
+
+    test "delete_claim_status/1 deletes the claim_status" do
+      claim_status = claim_status_fixture()
+      assert {:ok, %ClaimStatus{}} = Court.delete_claim_status(claim_status)
+      assert_raise Ecto.NoResultsError, fn -> Court.get_claim_status!(claim_status.id) end
+    end
+
+    test "change_claim_status/1 returns a claim_status changeset" do
+      claim_status = claim_status_fixture()
+      assert %Ecto.Changeset{} = Court.change_claim_status(claim_status)
+    end
+  end
 end

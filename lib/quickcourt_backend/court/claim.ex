@@ -3,6 +3,7 @@ defmodule QuickcourtBackend.Court.Claim do
   import Ecto.Changeset
 
   alias QuickcourtBackend.Shared.Country
+  alias QuickcourtBackend.Court.ClaimStatus
   alias QuickcourtBackend.Auth.User
 
   schema "claims" do
@@ -40,6 +41,8 @@ defmodule QuickcourtBackend.Court.Claim do
     field :claim_for_money, :boolean, default: false
     field :amount, :float, default: nil
     field :currency, :string, default: nil
+
+    belongs_to :claim_status_id, ClaimStatus
 
     belongs_to :user, User
     timestamps()

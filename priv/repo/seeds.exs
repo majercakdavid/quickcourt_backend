@@ -12,6 +12,7 @@
 
 alias QuickcourtBackend.Court.ClaimRule
 alias QuickcourtBackend.Shared.Country
+alias QuickcourtBackend.Court.ClaimStatus
 alias QuickcourtBackend.Repo
 
 File.stream!("./priv/repo/consumer_choices.csv")
@@ -66,4 +67,18 @@ eu_countries = [
 
 Enum.each(eu_countries, fn eu_country ->
   %Country{name: eu_country} |> Repo.insert!()
+end)
+
+statuses = [
+  "WARNING_SENT",
+  "DEFENDANT_RESPONDED",
+  "OFFER_ACCEPTED",
+  "OFFER_DECLINED",
+  "CLAIM_SENT",
+  "CANCELED",
+  "CLOSED"
+]
+
+Enum.each(statuses, fn status ->
+  %ClaimStatus{label: status} |> Repo.insert!()
 end)
