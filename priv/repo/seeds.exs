@@ -80,5 +80,5 @@ statuses = [
 ]
 
 Enum.each(statuses, fn status ->
-  %ClaimStatus{label: status} |> Repo.insert!()
+  %ClaimStatus{name: status} |> Repo.insert!()
 end)

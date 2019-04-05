@@ -42,7 +42,8 @@ defmodule QuickcourtBackend.Court.Claim do
     field :amount, :float, default: nil
     field :currency, :string, default: nil
 
-    belongs_to :claim_status_id, ClaimStatus
+    belongs_to :claim_status, ClaimStatus
+    field :warning_expiration_email_sent_on, :utc_datetime
 
     belongs_to :user, User
     timestamps()
@@ -83,6 +84,8 @@ defmodule QuickcourtBackend.Court.Claim do
       :claim_for_money,
       :amount,
       :currency,
+      :claim_status_id,
+      :warning_expiration_email_sent_on,
       :user_id
     ])
     |> validate_required([
@@ -115,6 +118,8 @@ defmodule QuickcourtBackend.Court.Claim do
       :claim_for_money,
       :amount,
       :currency,
+      :claim_status_id,
+      :warning_expiration_email_sent_on,
       :user_id
     ])
     |> fields_not_equal(:claimant_country_id, :defendant_country_id)
@@ -122,6 +127,7 @@ defmodule QuickcourtBackend.Court.Claim do
     |> foreign_key_constraint(:defendant_country_id)
     |> foreign_key_constraint(:purchase_country_id)
     |> foreign_key_constraint(:delivery_country_id)
+    |> foreign_key_constraint(:claim_status_id)
     |> foreign_key_constraint(:user_id)
     |> validate_required([:is_business])
   end

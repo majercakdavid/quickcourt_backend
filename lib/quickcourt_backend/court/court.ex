@@ -7,6 +7,7 @@ defmodule QuickcourtBackend.Court do
   alias QuickcourtBackend.Repo
 
   alias QuickcourtBackend.Court.Claim
+  alias QuickcourtBackend.Court.ClaimStatus
 
   @doc """
   Returns the list of claims.
@@ -64,7 +65,9 @@ defmodule QuickcourtBackend.Court do
             :claimant_country,
             :defendant_country,
             :purchase_country,
-            :delivery_country
+            :delivery_country,
+            :claim_status,
+            :user
           ])
 
         {:ok, preloaded_claim}
@@ -119,6 +122,33 @@ defmodule QuickcourtBackend.Court do
   """
   def change_claim(%Claim{} = claim) do
     Claim.changeset(claim, %{})
+  end
+
+  @doc """
+  Returns the list of claims for which the warning status has expired.
+
+  ## Examples
+
+      iex> expired_warning_claims()
+      [%Claim{}, ...]
+
+  """
+  def expired_warning_claims do
+    {:ok, expiry_date} =
+      DateTime.from_unix(DateTime.to_unix(DateTime.utc_now()) - 60 * 60 * 24 * 15)
+
+    expiry_naive_date = DateTime.to_naive(expiry_date)
+
+    Repo.all(
+      from claim in Claim,
+        left_join: claim_status in assoc(claim, :claim_status),
+        preload: [claim_status: claim_status],
+        where:
+          claim.inserted_at < ^expiry_naive_date and
+            (claim.warning_expiration_email_sent_on < ago(6, "day") or
+               is_nil(claim.warning_expiration_email_sent_on)) and
+            (claim_status.name == "WARNING_SENT" or claim_status.name == "OFFER_DECLINED")
+    )
   end
 
   alias QuickcourtBackend.Court.ClaimRule
@@ -354,5 +384,101 @@ defmodule QuickcourtBackend.Court do
   """
   def change_claim_rule(%ClaimRule{} = claim_rule) do
     ClaimRule.changeset(claim_rule, %{})
+  end
+
+  alias QuickcourtBackend.Court.ClaimStatus
+
+  @doc """
+  Returns the list of claim_statuses.
+
+  ## Examples
+
+      iex> list_claim_statuses()
+      [%ClaimStatus{}, ...]
+
+  """
+  def list_claim_statuses do
+    Repo.all(ClaimStatus)
+  end
+
+  @doc """
+  Gets a single claim_status.
+
+  Raises `Ecto.NoResultsError` if the Claim status does not exist.
+
+  ## Examples
+
+      iex> get_claim_status!(123)
+      %ClaimStatus{}
+
+      iex> get_claim_status!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_claim_status!(id), do: Repo.get!(ClaimStatus, id)
+
+  @doc """
+  Creates a claim_status.
+
+  ## Examples
+
+      iex> create_claim_status(%{field: value})
+      {:ok, %ClaimStatus{}}
+
+      iex> create_claim_status(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_claim_status(attrs \\ %{}) do
+    %ClaimStatus{}
+    |> ClaimStatus.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a claim_status.
+
+  ## Examples
+
+      iex> update_claim_status(claim_status, %{field: new_value})
+      {:ok, %ClaimStatus{}}
+
+      iex> update_claim_status(claim_status, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_claim_status(%ClaimStatus{} = claim_status, attrs) do
+    claim_status
+    |> ClaimStatus.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a ClaimStatus.
+
+  ## Examples
+
+      iex> delete_claim_status(claim_status)
+      {:ok, %ClaimStatus{}}
+
+      iex> delete_claim_status(claim_status)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_claim_status(%ClaimStatus{} = claim_status) do
+    Repo.delete(claim_status)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking claim_status changes.
+
+  ## Examples
+
+      iex> change_claim_status(claim_status)
+      %Ecto.Changeset{source: %ClaimStatus{}}
+
+  """
+  def change_claim_status(%ClaimStatus{} = claim_status) do
+    ClaimStatus.changeset(claim_status, %{})
   end
 end

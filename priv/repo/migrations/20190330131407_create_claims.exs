@@ -39,6 +39,7 @@ defmodule QuickcourtBackend.Repo.Migrations.CreateClaims do
       add :currency, :string, default: nil
 
       add :claim_status_id, references(:claim_statuses)
+      add :warning_expiration_email_sent_on, :utc_datetime
       add :user_id, references(:users)
 
       timestamps()

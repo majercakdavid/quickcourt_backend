@@ -45,7 +45,7 @@ defmodule QuickcourtBackend.MixProject do
       {:absinthe_ecto, "~> 0.1.3"},
       {:cowboy, "~> 2.6.1"},
       {:plug_cowboy, "~> 2.0.1"},
-      {:poison, "~> 3.1.0"},
+      {:poison, "~> 3.1.0", override: true},
       {:pdf2htmlex, "~> 0.1"},
       {:pdf_generator, ">=0.4.0"},
       {:sneeze, "~> 1.1"},
@@ -54,7 +54,8 @@ defmodule QuickcourtBackend.MixProject do
       {:distillery, "~> 1.4"},
       {:comeonin, "~> 5.1"},
       {:argon2_elixir, "~> 2.0"},
-      {:guardian, "~> 1.0"}
+      {:guardian, "~> 1.0"},
+      {:mailgun, "~> 0.1.2"}
     ]
   end
 
