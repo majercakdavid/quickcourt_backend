@@ -8,7 +8,9 @@
 use Mix.Config
 
 config :quickcourt_backend,
-  ecto_repos: [QuickcourtBackend.Repo]
+  ecto_repos: [QuickcourtBackend.Repo],
+  mailgun_domain: System.get_env("MAILGUN_DOMAIN") || "${MAILGUN_DOMAIN}",
+  mailgun_key: System.get_env("MAILGUN_API_KEY") || "${MAILGUN_API_KEY}"
 
 # Configures the endpoint
 config :quickcourt_backend, QuickcourtBackendWeb.Endpoint,
@@ -28,6 +30,7 @@ config :phoenix, :json_library, Jason
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
+import_config "config.secret.exs"
 
 # PDF generator X server
 {os_family, os_name} = :os.type()

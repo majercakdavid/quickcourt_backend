@@ -12,9 +12,10 @@ defmodule QuickcourtBackend.Application do
       # Start the Ecto repository
       QuickcourtBackend.Repo,
       # Start the endpoint when the application starts
-      QuickcourtBackendWeb.Endpoint
+      QuickcourtBackendWeb.Endpoint,
       # Starts a worker by calling: QuickcourtBackend.Worker.start_link(arg)
       # {QuickcourtBackend.Worker, arg},
+      QuickcourtBackend.ClaimStatusUpdater
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

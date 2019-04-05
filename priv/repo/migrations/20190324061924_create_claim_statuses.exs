@@ -3,7 +3,7 @@ defmodule QuickcourtBackend.Repo.Migrations.CreateClaimStatuses do
 
   def change do
     create table(:claim_statuses) do
-      add :label, :string
+      add :name, :string
 
       timestamps()
     end

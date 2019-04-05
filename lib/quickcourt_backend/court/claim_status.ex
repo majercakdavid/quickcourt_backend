@@ -3,7 +3,7 @@ defmodule QuickcourtBackend.Court.ClaimStatus do
   import Ecto.Changeset
 
   schema "claim_statuses" do
-    field :label, :string
+    field :name, :string
 
     timestamps()
   end
@@ -11,7 +11,7 @@ defmodule QuickcourtBackend.Court.ClaimStatus do
   @doc false
   def changeset(claim_status, attrs) do
     claim_status
-    |> cast(attrs, [:label])
-    |> validate_required([:label])
+    |> cast(attrs, [:name])
+    |> validate_required([:name])
   end
 end

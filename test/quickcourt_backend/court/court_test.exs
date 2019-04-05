@@ -165,9 +165,9 @@ defmodule QuickcourtBackend.CourtTest do
   describe "claim_statuses" do
     alias QuickcourtBackend.Court.ClaimStatus
 
-    @valid_attrs %{label: "some label"}
-    @update_attrs %{label: "some updated label"}
-    @invalid_attrs %{label: nil}
+    @valid_attrs %{name: "some name"}
+    @update_attrs %{name: "some updated name"}
+    @invalid_attrs %{name: nil}
 
     def claim_status_fixture(attrs \\ %{}) do
       {:ok, claim_status} =
@@ -190,7 +190,7 @@ defmodule QuickcourtBackend.CourtTest do
 
     test "create_claim_status/1 with valid data creates a claim_status" do
       assert {:ok, %ClaimStatus{} = claim_status} = Court.create_claim_status(@valid_attrs)
-      assert claim_status.label == "some label"
+      assert claim_status.name == "some name"
     end
 
     test "create_claim_status/1 with invalid data returns error changeset" do
@@ -203,7 +203,7 @@ defmodule QuickcourtBackend.CourtTest do
       assert {:ok, %ClaimStatus{} = claim_status} =
                Court.update_claim_status(claim_status, @update_attrs)
 
-      assert claim_status.label == "some updated label"
+      assert claim_status.name == "some updated name"
     end
 
     test "update_claim_status/2 with invalid data returns error changeset" do
