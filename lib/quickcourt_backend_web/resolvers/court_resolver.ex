@@ -9,10 +9,24 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     {:ok, claims}
   end
 
+  @spec update_claim_status(any(), any(), user_context()) :: any()
+  def update_claim_status(_root, %{claim_id: claim_id, status_id: status_id}, %{
+        context: %{current_user: user}
+      }) do
+    with claim <- Court.get_claim!(claim_id),
+         true <- claim_belongs_to_user?(claim, user),
+         true <- warning_expired?(claim),
+         {:ok, new_claim} <- Court.update_claim(claim, %{claim_status_id: 5}) do
+      {:ok, new_claim}
+    else
+      {:error, info} -> {:error, info}
+    end
+  end
+
   @spec create_claim(any(), any(), user_context()) :: any()
   def create_claim(_root, args, %{context: %{current_user: user}}) do
     case args
-         |> Map.merge(%{user_id: user.id})
+         |> Map.merge(%{user_id: user.id, claim_status_id: 1})
          |> Court.create_claim() do
       {:ok, claim} ->
         try do
@@ -83,5 +97,19 @@ defmodule QuickcourtBackendWeb.CourtResolver do
       Court.list_second_resolutions(agreement_type, agreement_type_issue, circumstance_invoked)
 
     {:ok, second_resolutions}
+  end
+
+  defp claim_belongs_to_user?(claim, user) do
+    case claim.user_id == user.id do
+      true -> true
+      _ -> {:error, "Unathorized"}
+    end
+  end
+
+  defp warning_expired?(claim) do
+    case claim.inserted_at < DateTime.add(DateTime.utc_now(), -60 * 60 * 24 * 7, :second) do
+      true -> true
+      _ -> {:error, "Claim warning phase is not yet expired"}
+    end
   end
 end
