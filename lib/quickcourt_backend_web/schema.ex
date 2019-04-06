@@ -47,6 +47,7 @@ defmodule QuickcourtBackendWeb.Schema do
   end
 
   object :claim do
+    field :case_number, non_null(:string)
     field :is_business, non_null(:boolean)
     field :claimant_name, non_null(:string)
     field :claimant_surname, non_null(:string)
@@ -55,8 +56,8 @@ defmodule QuickcourtBackendWeb.Schema do
     field :defendant_city, non_null(:string)
     field :claimant_zip, non_null(:string)
     field :defendant_zip, non_null(:string)
-    field :claimant_country, non_null(:string)
-    field :defendant_country, non_null(:string)
+    field :claimant_country, non_null(:enumeration)
+    field :defendant_country, non_null(:enumeration)
     field :claimant_address, non_null(:string)
     field :defendant_address, non_null(:string)
     field :claimant_email, non_null(:string)
@@ -68,9 +69,9 @@ defmodule QuickcourtBackendWeb.Schema do
     field :circumstance_invoked, non_null(:string)
     field :first_resolution, non_null(:string)
     field :second_resolution, non_null(:string)
-    field :purchase_country, :string
+    field :purchase_country, :enumeration
     field :purchase_date, non_null(:datetime)
-    field :delivery_country, :string
+    field :delivery_country, :enumeration
     field :delivery_date, non_null(:datetime)
     field :lack_discovery_date, non_null(:datetime)
 
@@ -80,6 +81,8 @@ defmodule QuickcourtBackendWeb.Schema do
     field :claim_for_money, non_null(:boolean)
     field :amount, non_null(:float)
     field :currency, non_null(:string)
+
+    field :claim_status, non_null(:enumeration)
 
     field :pdf_base64_small_claim_form, non_null(:string)
     field :pdf_base64_epo_a, non_null(:string)
@@ -146,6 +149,16 @@ defmodule QuickcourtBackendWeb.Schema do
       resolve(&UserResolver.login_user/3)
     end
 
+    @desc "Update claim status if it is longer than 14 days in warning sent status"
+    field :update_claim_status, :claim do
+      middleware(Middleware.Authorize, :any)
+      arg(:status_id, non_null(:integer))
+      arg(:claim_id, non_null(:integer))
+
+      resolve(&CourtResolver.update_claim_status/3)
+    end
+
+    @desc "Create claim and generate all the necessary documents"
     field :create_claim, :claim do
       middleware(Middleware.Authorize, :any)
 
