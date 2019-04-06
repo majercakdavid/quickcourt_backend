@@ -42,6 +42,11 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     end
   end
 
+  def get_user_claims(_root, _args, %{context: %{current_user: user}}) do
+    claims = Court.list_user_claims(user.id)
+    {:ok, claims}
+  end
+
   def all_agreement_types(_root, _args, _info) do
     agreement_types = Court.list_agreement_types()
     {:ok, agreement_types}
