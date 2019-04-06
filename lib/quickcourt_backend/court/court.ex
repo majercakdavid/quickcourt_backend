@@ -8,6 +8,8 @@ defmodule QuickcourtBackend.Court do
 
   alias QuickcourtBackend.Court.Claim
   alias QuickcourtBackend.Court.ClaimStatus
+  alias QuickcourtBackend.ClaimPdfGenerator
+  alias QuickcourtBackend.Email
 
   @doc """
   Returns the list of claims.
@@ -59,9 +61,9 @@ defmodule QuickcourtBackend.Court do
       |> Repo.insert()
 
     case claim_res do
-      {:ok, claim} ->
-        preloaded_claim =
-          Repo.preload(claim, [
+      {:ok, new_claim} ->
+        claim =
+          Repo.preload(new_claim, [
             :claimant_country,
             :defendant_country,
             :purchase_country,
@@ -70,7 +72,10 @@ defmodule QuickcourtBackend.Court do
             :user
           ])
 
-        {:ok, preloaded_claim}
+        warning_letter_pdf = ClaimPdfGenerator.generate_warning_letter_pdf(claim)
+        Email.send_warning_letter_defendant(claim, warning_letter_pdf)
+        Email.send_warning_letter_claimant(claim, warning_letter_pdf)
+        {:ok, %{claim: claim, warning_letter_pdf: Base.encode64(warning_letter_pdf)}}
 
       {:error, changeset} ->
         {:error, Map.get(changeset, :errors)}

@@ -18,7 +18,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
         PdfGenerator.generate(html, page_size: "A4", shell_params: ["--dpi", "300"])
 
       {:ok, file_contents} = File.read(filename)
-      Base.encode64(file_contents)
+      file_contents
     rescue
       e ->
         IO.puts("ERROR GENERATING PDF")
@@ -41,7 +41,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
         PdfGenerator.generate(html, page_size: "A4", shell_params: ["--dpi", "300"])
 
       {:ok, file_contents} = File.read(filename)
-      Base.encode64(file_contents)
+      file_contents
     rescue
       e ->
         IO.puts("ERROR GENERATING PDF")
@@ -64,7 +64,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
         PdfGenerator.generate(html, page_size: "A4", shell_params: ["--dpi", "300"])
 
       {:ok, file_contents} = File.read(filename)
-      Base.encode64(file_contents)
+      file_contents
     rescue
       e ->
         IO.puts("ERROR GENERATING PDF")
