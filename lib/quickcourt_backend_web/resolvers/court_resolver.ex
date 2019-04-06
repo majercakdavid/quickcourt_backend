@@ -1,6 +1,5 @@
 defmodule QuickcourtBackendWeb.CourtResolver do
   alias QuickcourtBackend.Court
-  alias QuickcourtBackend.ClaimPdfGenerator
 
   @type user_context() :: %{current_user: Auth.User}
 
@@ -10,12 +9,11 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   end
 
   @spec update_claim_status(any(), any(), user_context()) :: any()
-  def update_claim_status(_root, %{claim_id: claim_id, status_id: status_id}, %{
-        context: %{current_user: user}
-      }) do
+  def update_claim_status(_root, %{claim_id: claim_id}, _info = %{context: %{current_user: user}}) do
     with claim <- Court.get_claim!(claim_id),
          true <- claim_belongs_to_user?(claim, user),
          true <- warning_expired?(claim),
+         true <- can_be_updated?(claim),
          {:ok, new_claim} <- Court.update_claim(claim, %{claim_status_id: 5}) do
       {:ok, new_claim}
     else
@@ -28,17 +26,11 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     case args
          |> Map.merge(%{user_id: user.id, claim_status_id: 1})
          |> Court.create_claim() do
-      {:ok, claim} ->
+      {:ok, %{claim: claim, warning_letter_pdf: warning_letter_pdf}} ->
         try do
-          generated_pdf_small_claim_form = ClaimPdfGenerator.generate_small_claim_form_pdf(claim)
-          generated_pdf_epo_a = ClaimPdfGenerator.generate_epo_a_pdf(claim)
-          generated_pdf_warning_letter = ClaimPdfGenerator.generate_warning_letter_pdf(claim)
-
           result =
             Map.from_struct(claim)
-            |> Map.merge(%{pdf_base64_small_claim_form: generated_pdf_small_claim_form})
-            |> Map.merge(%{pdf_base64_epo_a: generated_pdf_epo_a})
-            |> Map.merge(%{pdf_base64_warning_letter: generated_pdf_warning_letter})
+            |> Map.merge(%{pdf_base64_warning_letter: warning_letter_pdf})
 
           {:ok, result}
         rescue
@@ -110,6 +102,15 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     case claim.inserted_at < DateTime.add(DateTime.utc_now(), -60 * 60 * 24 * 7, :second) do
       true -> true
       _ -> {:error, "Claim warning phase is not yet expired"}
+    end
+  end
+
+  defp can_be_updated?(claim) do
+    # Either it is in warning phase and the defendant did not respond or
+    # the offer made by the defendant was declined
+    case claim.status_id == 1 or claim.status_id == 4 do
+      true -> true
+      _ -> {:error, "Claim cannot be created and sent in this phase"}
     end
   end
 end

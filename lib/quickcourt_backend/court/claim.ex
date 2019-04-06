@@ -119,10 +119,13 @@ defmodule QuickcourtBackend.Court.Claim do
       :amount,
       :currency,
       :claim_status_id,
-      :warning_expiration_email_sent_on,
       :user_id
     ])
     |> fields_not_equal(:claimant_country_id, :defendant_country_id)
+    |> validate_format(:claimant_email, ~r/@/)
+    |> update_change(:claimant_email, &String.downcase(&1))
+    |> validate_format(:defendant_email, ~r/@/)
+    |> update_change(:defendant_email, &String.downcase(&1))
     |> foreign_key_constraint(:claimant_country_id)
     |> foreign_key_constraint(:defendant_country_id)
     |> foreign_key_constraint(:purchase_country_id)

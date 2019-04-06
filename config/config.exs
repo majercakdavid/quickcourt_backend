@@ -8,9 +8,12 @@
 use Mix.Config
 
 config :quickcourt_backend,
-  ecto_repos: [QuickcourtBackend.Repo],
-  mailgun_domain: System.get_env("MAILGUN_DOMAIN") || "${MAILGUN_DOMAIN}",
-  mailgun_key: System.get_env("MAILGUN_API_KEY") || "${MAILGUN_API_KEY}"
+  ecto_repos: [QuickcourtBackend.Repo]
+
+config :quickcourt_backend, QuickcourtBackend.Mailer,
+  adapter: Bamboo.MailgunAdapter,
+  domain: System.get_env("MAILGUN_DOMAIN") || "${MAILGUN_DOMAIN}",
+  api_key: System.get_env("MAILGUN_API_KEY") || "${MAILGUN_API_KEY}"
 
 # Configures the endpoint
 config :quickcourt_backend, QuickcourtBackendWeb.Endpoint,
@@ -30,6 +33,7 @@ config :phoenix, :json_library, Jason
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
+
 if Mix.env() == :dev do
   import_config "config.secret.exs"
 end
