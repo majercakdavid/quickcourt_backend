@@ -20,7 +20,7 @@ defmodule QuickcourtBackend.MixProject do
   def application do
     [
       mod: {QuickcourtBackend.Application, []},
-      extra_applications: [:logger, :runtime_tools, :pdf_generator]
+      extra_applications: [:logger, :runtime_tools, :pdf_generator, :bamboo]
     ]
   end
 
@@ -55,7 +55,7 @@ defmodule QuickcourtBackend.MixProject do
       {:comeonin, "~> 5.1"},
       {:argon2_elixir, "~> 2.0"},
       {:guardian, "~> 1.0"},
-      {:mailgun, "~> 0.1.2"}
+      {:bamboo, "~> 1.2"}
     ]
   end
 
