@@ -102,6 +102,12 @@ defmodule QuickcourtBackendWeb.Schema do
       resolve(&UserResolver.get_user/3)
     end
 
+    @desc "Get claims that belongs to a user"
+    field :claims, non_null(list_of(:claim)) do
+      middleware(Middleware.Authorize, :any)
+      resolve(&CourtResolver.get_user_claims/3)
+    end
+
     field :countries, non_null(list_of(non_null(:enumeration))) do
       resolve(&SharedResolver.all_countries/3)
     end

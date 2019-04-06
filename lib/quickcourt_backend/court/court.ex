@@ -25,6 +25,30 @@ defmodule QuickcourtBackend.Court do
   end
 
   @doc """
+  Returns the list of user's claims.
+
+  ## Examples
+
+      iex> list_user_claims()
+      [%Claim{}, ...]
+
+  """
+  def list_user_claims(user_id) do
+    Repo.all(
+      from claim in Claim,
+        preload: [
+          :claimant_country,
+          :defendant_country,
+          :purchase_country,
+          :delivery_country,
+          :claim_status,
+          :user
+        ],
+        where: claim.user_id == ^user_id
+    )
+  end
+
+  @doc """
   Gets a single claim.
 
   Raises `Ecto.NoResultsError` if the Claim does not exist.
