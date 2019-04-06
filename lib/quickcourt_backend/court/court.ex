@@ -99,7 +99,7 @@ defmodule QuickcourtBackend.Court do
         warning_letter_pdf = ClaimPdfGenerator.generate_warning_letter_pdf(claim)
         Email.send_warning_letter_defendant(claim, warning_letter_pdf)
         Email.send_warning_letter_claimant(claim, warning_letter_pdf)
-        {:ok, %{claim: claim, warning_letter_pdf: Base.encode64(warning_letter_pdf)}}
+        {:ok, %{claim: claim, warning_letter_pdf: warning_letter_pdf}}
 
       {:error, changeset} ->
         {:error, Map.get(changeset, :errors)}

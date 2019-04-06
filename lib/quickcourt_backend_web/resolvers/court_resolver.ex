@@ -1,5 +1,6 @@
 defmodule QuickcourtBackendWeb.CourtResolver do
   alias QuickcourtBackend.Court
+  alias QuickcourtBackend.ClaimPdfGenerator
 
   @type user_context() :: %{current_user: Auth.User}
 
@@ -30,8 +31,10 @@ defmodule QuickcourtBackendWeb.CourtResolver do
         try do
           result =
             Map.from_struct(claim)
-            |> Map.merge(%{pdf_base64_warning_letter: warning_letter_pdf})
-
+            |> Map.merge(%{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})
+            |> Map.merge(%{pdf_base64_small_claim_form: nil})
+            |> Map.merge(%{pdf_base64_epo_a: nil})
+            
           {:ok, result}
         rescue
           RuntimeError -> {:error, "There was an error generating PDF document(s)"}
@@ -42,8 +45,26 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     end
   end
 
-  def get_user_claims(_root, _args, %{context: %{current_user: user}}) do
-    claims = Court.list_user_claims(user.id)
+  def get_user_claims(_root, _args, info = %{context: %{current_user: user}}) do
+    queried_fields = Absinthe.Resolution.project(info) |> Enum.map(& &1.name)
+
+    claims =
+      Court.list_user_claims(user.id)
+      |> Enum.map(fn claim ->
+        claim =
+          case Enum.member?(queried_fields, "pdf_base64_warning_letter") do
+            true ->
+              warning_letter_pdf = ClaimPdfGenerator.generate_warning_letter_pdf(claim)
+              Map.merge(claim, %{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})
+
+            _ ->
+              claim
+          end
+          claim
+          |> Map.merge(claim, %{pdf_base64_small_claim_form: nil})
+          |> Map.merge(claim, %{pdf_base64_epo_a: nil})
+      end)
+
     {:ok, claims}
   end
 

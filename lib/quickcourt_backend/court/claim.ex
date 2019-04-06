@@ -4,26 +4,32 @@ defmodule QuickcourtBackend.Court.Claim do
 
   alias QuickcourtBackend.Shared.Country
   alias QuickcourtBackend.Court.ClaimStatus
+  alias QuickcourtBackend.Court.ClaimRule
   alias QuickcourtBackend.Auth.User
 
   schema "claims" do
-    field :case_number, :string
+    # Claimant part
     field :is_business, :boolean, default: false
     field :claimant_name, :string
     field :claimant_surname, :string
-    field :defendant_company_name, :string
     field :claimant_city, :string
-    field :defendant_city, :string
     field :claimant_zip, :string
-    field :defendant_zip, :string
     belongs_to :claimant_country, Country
-    belongs_to :defendant_country, Country
     field :claimant_address, :string
-    field :defendant_address, :string
     field :claimant_email, :string
-    field :defendant_email, :string
     field :claimant_phone, :string
+
+    # Defendant part
+    field :defendant_company_name, :string
+    field :defendant_city, :string
+    field :defendant_zip, :string
+    belongs_to :defendant_country, Country
+    field :defendant_address, :string
+    field :defendant_email, :string
     field :defendant_phone, :string
+
+    # Claim part
+    field :case_number, :string
     field :agreement_type, :string
     field :agreement_type_issue, :string
     field :circumstance_invoked, :string
@@ -34,17 +40,23 @@ defmodule QuickcourtBackend.Court.Claim do
     belongs_to :delivery_country, Country
     field :delivery_date, :utc_datetime
     field :lack_discovery_date, :utc_datetime
-
     field :genus_description, :string
-    field :spieces_description, :string
-
+    field :species_description, :string
     field :claim_for_money, :boolean, default: false
     field :amount, :float, default: nil
     field :currency, :string, default: nil
 
+    # Claim stages
     belongs_to :claim_status, ClaimStatus
+
+    # After warning status expiration
+    # field :final_resolution_id, 
+
+    # To not to send arbitraty emails when checking which
+    # claims are expired
     field :warning_expiration_email_sent_on, :utc_datetime
 
+    # Claimant user
     belongs_to :user, User
     timestamps()
   end
@@ -80,7 +92,7 @@ defmodule QuickcourtBackend.Court.Claim do
       :first_resolution,
       :second_resolution,
       :genus_description,
-      :spieces_description,
+      :species_description,
       :claim_for_money,
       :amount,
       :currency,

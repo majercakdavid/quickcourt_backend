@@ -76,7 +76,7 @@ defmodule QuickcourtBackendWeb.Schema do
     field :lack_discovery_date, non_null(:datetime)
 
     field :genus_description, non_null(:string)
-    field :spieces_description, non_null(:string)
+    field :species_description, :string
 
     field :claim_for_money, non_null(:boolean)
     field :amount, non_null(:float)
@@ -84,8 +84,8 @@ defmodule QuickcourtBackendWeb.Schema do
 
     field :claim_status, non_null(:enumeration)
 
-    field :pdf_base64_small_claim_form, non_null(:string)
-    field :pdf_base64_epo_a, non_null(:string)
+    field :pdf_base64_small_claim_form, :string
+    field :pdf_base64_epo_a, :string
     field :pdf_base64_warning_letter, non_null(:string)
   end
 
@@ -103,7 +103,7 @@ defmodule QuickcourtBackendWeb.Schema do
     end
 
     @desc "Get claims that belongs to a user"
-    field :claims, non_null(list_of(:claim)) do
+    field :claims, non_null(list_of(non_null(:claim))) do
       middleware(Middleware.Authorize, :any)
       resolve(&CourtResolver.get_user_claims/3)
     end
@@ -197,7 +197,7 @@ defmodule QuickcourtBackendWeb.Schema do
       arg(:lack_discovery_date, non_null(:datetime))
 
       arg(:genus_description, non_null(:string))
-      arg(:spieces_description, non_null(:string))
+      arg(:species_description, non_null(:string))
 
       arg(:claim_for_money, non_null(:boolean))
       arg(:amount, non_null(:float))
