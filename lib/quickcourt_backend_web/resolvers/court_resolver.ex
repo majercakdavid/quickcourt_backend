@@ -10,7 +10,7 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   end
 
   @spec update_claim_status(any(), any(), user_context()) :: any()
-  def update_claim_status(_root, %{claim_id: claim_id}, _info = %{context: %{current_user: user}}) do
+  def update_claim_status(_root, %{id: claim_id}, _info = %{context: %{current_user: user}}) do
     with claim <- Court.get_claim!(claim_id),
          true <- claim_belongs_to_user?(claim, user),
          true <- warning_expired?(claim),
@@ -152,7 +152,7 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   defp can_be_updated?(claim) do
     # Either it is in warning phase and the defendant did not respond or
     # the offer made by the defendant was declined
-    case claim.status_id == 1 or claim.status_id == 4 do
+    case claim.claim_status_id == 1 or claim.claim_status_id == 4 do
       true -> true
       _ -> {:error, "Claim cannot be created and sent in this phase"}
     end

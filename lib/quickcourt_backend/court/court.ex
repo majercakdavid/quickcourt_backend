@@ -129,28 +129,21 @@ defmodule QuickcourtBackend.Court do
 
   """
   def update_claim(%Claim{} = claim, attrs) do
-    claim_res =
-      claim
-      |> Claim.changeset(attrs)
-      |> Repo.update()
-
-    case claim_res do
-      {:ok, claim} ->
-        preloaded_claim =
-          Repo.preload(claim, [
-            :claimant_country,
-            :defendant_country,
-            :purchase_country,
-            :delivery_country,
-            :claim_status,
-            :user
-          ])
-
-        {:ok, preloaded_claim}
-
-      {:error, changeset} ->
-        {:error, Map.get(changeset, :errors)}
-    end
+    with {:ok, claim} <- claim |> Claim.changeset(attrs) |> Repo.update(),
+         claim <-
+           Repo.preload(claim, [
+             :claimant_country,
+             :defendant_country,
+             :purchase_country,
+             :delivery_country,
+             :claim_status,
+             :user
+           ], force: true) do
+             {:ok, claim}
+           else
+            {:error, changeset} ->
+              {:error, Map.get(changeset, :errors)}
+           end
   end
 
   @doc """
