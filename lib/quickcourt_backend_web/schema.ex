@@ -47,6 +47,8 @@ defmodule QuickcourtBackendWeb.Schema do
   end
 
   object :claim do
+    field :id, non_null(:id)
+
     field :case_number, non_null(:string)
     field :is_business, non_null(:boolean)
     field :claimant_name, non_null(:string)
@@ -108,6 +110,12 @@ defmodule QuickcourtBackendWeb.Schema do
     field :claims, non_null(list_of(non_null(:claim))) do
       middleware(Middleware.Authorize, :any)
       resolve(&CourtResolver.get_user_claims/3)
+    end
+
+    field :claim, non_null(:claim) do
+      arg(:id, non_null(:id))
+      middleware(Middleware.Authorize, :any)
+      resolve(&CourtResolver.get_claim/3)
     end
 
     field :countries, non_null(list_of(non_null(:enumeration))) do
