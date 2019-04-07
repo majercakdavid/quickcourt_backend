@@ -62,7 +62,17 @@ defmodule QuickcourtBackend.Court do
       ** (Ecto.NoResultsError)
 
   """
-  def get_claim!(id), do: Repo.get!(Claim, id)
+  def get_claim!(id),
+    do:
+      Repo.get!(Claim, id)
+      |> Repo.preload([
+        :claimant_country,
+        :defendant_country,
+        :purchase_country,
+        :delivery_country,
+        :claim_status,
+        :user
+      ])
 
   @doc """
   Creates a claim.

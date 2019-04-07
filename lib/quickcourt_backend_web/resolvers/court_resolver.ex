@@ -52,7 +52,7 @@ defmodule QuickcourtBackendWeb.CourtResolver do
       Court.list_user_claims(user.id)
       |> Enum.map(fn claim ->
         claim =
-          case Enum.member?(queried_fields, "pdf_base64_warning_letter") do
+          case Enum.member?(queried_fields, "pdfBase64WarningLetter") do
             true ->
               warning_letter_pdf = ClaimPdfGenerator.generate_warning_letter_pdf(claim)
               Map.merge(claim, %{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})
@@ -60,12 +60,30 @@ defmodule QuickcourtBackendWeb.CourtResolver do
             _ ->
               claim
           end
-          claim
-          |> Map.merge(%{pdf_base64_small_claim_form: nil})
-          |> Map.merge(%{pdf_base64_epo_a: nil})
+
+        claim
+        |> Map.merge(%{pdf_base64_small_claim_form: nil})
+        |> Map.merge(%{pdf_base64_epo_a: nil})
       end)
 
     {:ok, claims}
+  end
+
+  def get_claim(_root, %{id: claim_id}, info = %{context: %{current_user: user}}) do
+    queried_fields = Absinthe.Resolution.project(info) |> Enum.map(& &1.name)
+
+    claim = Court.get_claim!(claim_id)
+
+    with true <- claim_belongs_to_user?(claim, user),
+         claim <- merge_warning_letter_if_necessary(claim, queried_fields) do
+      claim = claim
+      |> Map.merge(%{pdf_base64_small_claim_form: nil})
+      |> Map.merge(%{pdf_base64_epo_a: nil})
+
+      {:ok, claim}
+    else
+      _ -> {:error, "Unathorized"}
+    end
   end
 
   def all_agreement_types(_root, _args, _info) do
@@ -137,6 +155,17 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     case claim.status_id == 1 or claim.status_id == 4 do
       true -> true
       _ -> {:error, "Claim cannot be created and sent in this phase"}
+    end
+  end
+
+  defp merge_warning_letter_if_necessary(claim, queried_fields) do
+    case(Enum.member?(queried_fields, "pdfBase64WarningLetter")) do
+      true ->
+        warning_letter_pdf = ClaimPdfGenerator.generate_warning_letter_pdf(claim)
+        Map.merge(claim, %{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})
+
+      _ ->
+        claim
     end
   end
 end
