@@ -87,6 +87,8 @@ defmodule QuickcourtBackendWeb.Schema do
     field :pdf_base64_small_claim_form, :string
     field :pdf_base64_epo_a, :string
     field :pdf_base64_warning_letter, non_null(:string)
+
+    field :inserted_at, :naive_datetime
   end
 
   query do
