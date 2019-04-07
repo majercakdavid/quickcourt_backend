@@ -168,7 +168,7 @@ defmodule QuickcourtBackendWeb.Schema do
     @desc "Update claim status if it is longer than 14 days in warning sent status"
     field :update_claim_status, :claim do
       middleware(Middleware.Authorize, :any)
-      arg(:claim_id, non_null(:integer))
+      arg(:id, non_null(:id))
 
       resolve(&CourtResolver.update_claim_status/3)
     end
