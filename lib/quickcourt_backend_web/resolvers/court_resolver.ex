@@ -34,7 +34,7 @@ defmodule QuickcourtBackendWeb.CourtResolver do
             |> Map.merge(%{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})
             |> Map.merge(%{pdf_base64_small_claim_form: nil})
             |> Map.merge(%{pdf_base64_epo_a: nil})
-            
+
           {:ok, result}
         rescue
           RuntimeError -> {:error, "There was an error generating PDF document(s)"}
@@ -61,8 +61,8 @@ defmodule QuickcourtBackendWeb.CourtResolver do
               claim
           end
           claim
-          |> Map.merge(claim, %{pdf_base64_small_claim_form: nil})
-          |> Map.merge(claim, %{pdf_base64_epo_a: nil})
+          |> Map.merge(%{pdf_base64_small_claim_form: nil})
+          |> Map.merge(%{pdf_base64_epo_a: nil})
       end)
 
     {:ok, claims}
