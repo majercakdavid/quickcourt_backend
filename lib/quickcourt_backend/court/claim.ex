@@ -180,16 +180,17 @@ defmodule QuickcourtBackend.Court.Claim do
          ) do
       [_ | []] ->
         changeset
-        # |> put_change(:agreement_type, String.slice(cr.agreement_type, 3..-1))
-        # |> put_change(:agreement_type_issue, cr.agreement_type_issue)
-        # |> put_change(:circumstances_invoked, cr.circumstances_invoked)
-        # |> put_change(:first_resolution, cr.first_resolution)
-        # |> put_change(:second_resolution, cr.second_resolution)
-        # |> delete_change(:agreement_type_code)
-        # |> delete_change(:agreement_type_issue_code)
-        # |> delete_change(:circumstances_invoked_code)
-        # |> delete_change(:first_resolution_code)
-        # |> delete_change(:second_resolution_code)
+
+      # |> put_change(:agreement_type, String.slice(cr.agreement_type, 3..-1))
+      # |> put_change(:agreement_type_issue, cr.agreement_type_issue)
+      # |> put_change(:circumstances_invoked, cr.circumstances_invoked)
+      # |> put_change(:first_resolution, cr.first_resolution)
+      # |> put_change(:second_resolution, cr.second_resolution)
+      # |> delete_change(:agreement_type_code)
+      # |> delete_change(:agreement_type_issue_code)
+      # |> delete_change(:circumstances_invoked_code)
+      # |> delete_change(:first_resolution_code)
+      # |> delete_change(:second_resolution_code)
 
       [] ->
         add_error(
