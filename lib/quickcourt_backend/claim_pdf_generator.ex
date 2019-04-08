@@ -74,7 +74,13 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
   end
 
   defp claim_to_list(claim) do
-    Map.from_struct(claim)
+    claim =
+      case is_map(claim) do
+        true -> claim
+        _ -> Map.from_struct(claim)
+      end
+
+    claim
     |> Enum.filter(fn {k, v} ->
       !Enum.member?(["__meta__", "inserted_at", "updated_at", "user"], Atom.to_string(k)) &&
         v != nil

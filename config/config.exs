@@ -11,9 +11,8 @@ config :quickcourt_backend,
   ecto_repos: [QuickcourtBackend.Repo]
 
 config :quickcourt_backend, QuickcourtBackend.Mailer,
-  adapter: Bamboo.MailgunAdapter,
-  domain: System.get_env("MAILGUN_DOMAIN") || "${MAILGUN_DOMAIN}",
-  api_key: System.get_env("MAILGUN_API_KEY") || "${MAILGUN_API_KEY}"
+  adapter: Bamboo.SendGridAdapter,
+  api_key: System.get_env("SENDGRID_API_KEY") || "${SENDGRID_API_KEY}"
 
 # Configures the endpoint
 config :quickcourt_backend, QuickcourtBackendWeb.Endpoint,

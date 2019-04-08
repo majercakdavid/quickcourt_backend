@@ -91,31 +91,31 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     {:ok, agreement_types}
   end
 
-  def all_agreement_type_issues(_root, %{agreement_type: agreement_type}, _info) do
-    agreement_type_issues = Court.list_agreement_type_issues(agreement_type)
+  def all_agreement_type_issues(_root, %{agreement_type_code: agreement_type_code}, _info) do
+    agreement_type_issues = Court.list_agreement_type_issues(agreement_type_code)
     {:ok, agreement_type_issues}
   end
 
   def all_circumstances_invoked(
         _root,
-        %{agreement_type: agreement_type, agreement_type_issue: agreement_type_issue},
+        %{agreement_type_code: agreement_type_code, agreement_type_issue_code: agreement_type_issue_code},
         _info
       ) do
-    agreement_type_issues = Court.list_circumstances_invoked(agreement_type, agreement_type_issue)
+    agreement_type_issues = Court.list_circumstances_invoked(agreement_type_code, agreement_type_issue_code)
     {:ok, agreement_type_issues}
   end
 
   def all_first_resolutions(
         _root,
         %{
-          agreement_type: agreement_type,
-          agreement_type_issue: agreement_type_issue,
-          circumstance_invoked: circumstance_invoked
+          agreement_type_code: agreement_type_code,
+          agreement_type_issue_code: agreement_type_issue_code,
+          circumstances_invoked_code: circumstances_invoked_code
         },
         _info
       ) do
     first_resolutions =
-      Court.list_first_resolutions(agreement_type, agreement_type_issue, circumstance_invoked)
+      Court.list_first_resolutions(agreement_type_code, agreement_type_issue_code, circumstances_invoked_code)
 
     {:ok, first_resolutions}
   end
@@ -123,14 +123,14 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   def all_second_resolutions(
         _root,
         %{
-          agreement_type: agreement_type,
-          agreement_type_issue: agreement_type_issue,
-          circumstance_invoked: circumstance_invoked
+          agreement_type_code: agreement_type_code,
+          agreement_type_issue_code: agreement_type_issue_code,
+          circumstances_invoked_code: circumstances_invoked_code
         },
         _info
       ) do
     second_resolutions =
-      Court.list_second_resolutions(agreement_type, agreement_type_issue, circumstance_invoked)
+      Court.list_second_resolutions(agreement_type_code, agreement_type_issue_code, circumstances_invoked_code)
 
     {:ok, second_resolutions}
   end

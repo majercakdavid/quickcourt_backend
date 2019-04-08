@@ -4,7 +4,6 @@ defmodule QuickcourtBackend.Court.Claim do
 
   alias QuickcourtBackend.Shared.Country
   alias QuickcourtBackend.Court.ClaimStatus
-  alias QuickcourtBackend.Court.ClaimRule
   alias QuickcourtBackend.Auth.User
 
   schema "claims" do
@@ -30,11 +29,11 @@ defmodule QuickcourtBackend.Court.Claim do
 
     # Claim part
     field :case_number, :string
-    field :agreement_type, :string
-    field :agreement_type_issue, :string
-    field :circumstance_invoked, :string
-    field :first_resolution, :string
-    field :second_resolution, :string
+    field :agreement_type_code, :string
+    field :agreement_type_issue_code, :string
+    field :circumstances_invoked_code, :string
+    field :first_resolution_code, :string
+    field :second_resolution_code, :string
     belongs_to :purchase_country, Country
     field :purchase_date, :utc_datetime
     belongs_to :delivery_country, Country
@@ -86,11 +85,11 @@ defmodule QuickcourtBackend.Court.Claim do
       :lack_discovery_date,
       :claimant_country_id,
       :defendant_country_id,
-      :agreement_type,
-      :agreement_type_issue,
-      :circumstance_invoked,
-      :first_resolution,
-      :second_resolution,
+      :agreement_type_code,
+      :agreement_type_issue_code,
+      :circumstances_invoked_code,
+      :first_resolution_code,
+      :second_resolution_code,
       :genus_description,
       :species_description,
       :claim_for_money,
@@ -122,10 +121,10 @@ defmodule QuickcourtBackend.Court.Claim do
       :lack_discovery_date,
       :claimant_country_id,
       :defendant_country_id,
-      :agreement_type,
-      :agreement_type_issue,
-      :circumstance_invoked,
-      :first_resolution,
+      :agreement_type_code,
+      :agreement_type_issue_code,
+      :circumstances_invoked_code,
+      :first_resolution_code,
       :genus_description,
       :claim_for_money,
       :amount,
@@ -138,6 +137,7 @@ defmodule QuickcourtBackend.Court.Claim do
     |> update_change(:claimant_email, &String.downcase(&1))
     |> validate_format(:defendant_email, ~r/@/)
     |> update_change(:defendant_email, &String.downcase(&1))
+    |> validate_and_translate_claim_rule()
     |> foreign_key_constraint(:claimant_country_id)
     |> foreign_key_constraint(:defendant_country_id)
     |> foreign_key_constraint(:purchase_country_id)
@@ -163,4 +163,47 @@ defmodule QuickcourtBackend.Court.Claim do
   end
 
   defp fields_not_equal(changeset, _, _, _, _), do: changeset
+
+  defp validate_and_translate_claim_rule(changeset) do
+    agreement_type_code = get_field(changeset, :agreement_type_code)
+    agreement_type_issue_code = get_field(changeset, :agreement_type_issue_code)
+    circumstances_invoked_code = get_field(changeset, :circumstances_invoked_code)
+    first_resolution_code = get_field(changeset, :first_resolution_code)
+    second_resolution_code = get_field(changeset, :second_resolution_code, nil)
+
+    case QuickcourtBackend.Court.get_claim_rules_by_codes(
+           agreement_type_code,
+           agreement_type_issue_code,
+           circumstances_invoked_code,
+           first_resolution_code,
+           second_resolution_code
+         ) do
+      [_ | []] ->
+        changeset
+        # |> put_change(:agreement_type, String.slice(cr.agreement_type, 3..-1))
+        # |> put_change(:agreement_type_issue, cr.agreement_type_issue)
+        # |> put_change(:circumstances_invoked, cr.circumstances_invoked)
+        # |> put_change(:first_resolution, cr.first_resolution)
+        # |> put_change(:second_resolution, cr.second_resolution)
+        # |> delete_change(:agreement_type_code)
+        # |> delete_change(:agreement_type_issue_code)
+        # |> delete_change(:circumstances_invoked_code)
+        # |> delete_change(:first_resolution_code)
+        # |> delete_change(:second_resolution_code)
+
+      [] ->
+        add_error(
+          changeset,
+          :agreement_type_code,
+          "Combination of agreement_type_code, agreement_type_issue_code, circumstances_invoked_code, first_resolution_code, second_resolution_code is invalid"
+        )
+
+      [_ | _] ->
+        add_error(
+          changeset,
+          :second_resolution_code,
+          "Combination of agreement_type_code, agreement_type_issue_code, circumstances_invoked_code, first_resolution_code, second_resolution_code is ambigious, probably you are missing second_resolution_code"
+        )
+    end
+  end
 end
