@@ -51,17 +51,7 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     claims =
       Court.list_user_claims(user.id)
       |> Enum.map(fn claim ->
-        claim =
-          case Enum.member?(queried_fields, "pdfBase64WarningLetter") do
-            true ->
-              warning_letter_pdf = ClaimPdfGenerator.generate_warning_letter_pdf(claim)
-              Map.merge(claim, %{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})
-
-            _ ->
-              claim
-          end
-
-        claim
+        merge_warning_letter_if_necessary(claim, queried_fields)
         |> Map.merge(%{pdf_base64_small_claim_form: nil})
         |> Map.merge(%{pdf_base64_epo_a: nil})
       end)
@@ -76,9 +66,10 @@ defmodule QuickcourtBackendWeb.CourtResolver do
 
     with true <- claim_belongs_to_user?(claim, user),
          claim <- merge_warning_letter_if_necessary(claim, queried_fields) do
-      claim = claim
-      |> Map.merge(%{pdf_base64_small_claim_form: nil})
-      |> Map.merge(%{pdf_base64_epo_a: nil})
+      claim =
+        claim
+        |> Map.merge(%{pdf_base64_small_claim_form: nil})
+        |> Map.merge(%{pdf_base64_epo_a: nil})
 
       {:ok, claim}
     else
@@ -98,10 +89,15 @@ defmodule QuickcourtBackendWeb.CourtResolver do
 
   def all_circumstances_invoked(
         _root,
-        %{agreement_type_code: agreement_type_code, agreement_type_issue_code: agreement_type_issue_code},
+        %{
+          agreement_type_code: agreement_type_code,
+          agreement_type_issue_code: agreement_type_issue_code
+        },
         _info
       ) do
-    agreement_type_issues = Court.list_circumstances_invoked(agreement_type_code, agreement_type_issue_code)
+    agreement_type_issues =
+      Court.list_circumstances_invoked(agreement_type_code, agreement_type_issue_code)
+
     {:ok, agreement_type_issues}
   end
 
@@ -115,7 +111,11 @@ defmodule QuickcourtBackendWeb.CourtResolver do
         _info
       ) do
     first_resolutions =
-      Court.list_first_resolutions(agreement_type_code, agreement_type_issue_code, circumstances_invoked_code)
+      Court.list_first_resolutions(
+        agreement_type_code,
+        agreement_type_issue_code,
+        circumstances_invoked_code
+      )
 
     {:ok, first_resolutions}
   end
@@ -130,7 +130,11 @@ defmodule QuickcourtBackendWeb.CourtResolver do
         _info
       ) do
     second_resolutions =
-      Court.list_second_resolutions(agreement_type_code, agreement_type_issue_code, circumstances_invoked_code)
+      Court.list_second_resolutions(
+        agreement_type_code,
+        agreement_type_issue_code,
+        circumstances_invoked_code
+      )
 
     {:ok, second_resolutions}
   end
@@ -161,8 +165,26 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   defp merge_warning_letter_if_necessary(claim, queried_fields) do
     case(Enum.member?(queried_fields, "pdfBase64WarningLetter")) do
       true ->
-        warning_letter_pdf = ClaimPdfGenerator.generate_warning_letter_pdf(claim)
-        Map.merge(claim, %{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})
+        with [cr | []] <-
+               QuickcourtBackend.Court.get_claim_rules_by_codes(
+                 claim.agreement_type_code,
+                 claim.agreement_type_issue_code,
+                 claim.circumstances_invoked_code,
+                 claim.first_resolution_code,
+                 claim.second_resolution_code
+               ),
+             claim_map =
+               Map.from_struct(claim)
+               |> Map.put(:agreement_type, String.slice(cr.agreement_type, 3..-1))
+               |> Map.put(:agreement_type_issue, cr.agreement_type_issue)
+               |> Map.put(:circumstances_invoked, cr.circumstances_invoked)
+               |> Map.put(:first_resolution, cr.first_resolution)
+               |> Map.put(:second_resolution, cr.second_resolution),
+             warning_letter_pdf <- ClaimPdfGenerator.generate_warning_letter_pdf(claim_map) do
+          Map.merge(claim, %{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})
+        else
+          _ -> {:error, "There was an error generating warning letter"}
+        end
 
       _ ->
         claim
