@@ -21,8 +21,8 @@ File.stream!("./priv/repo/consumer_choices.csv")
   headers: [
     :agreement_type,
     :agreement_type_issue,
-    :cicumstance_invoked_code,
-    :circumstance_invoked,
+    :circumstances_invoked_code,
+    :circumstances_invoked,
     :first_resolution_code,
     :first_resolution,
     :second_resolution_code,

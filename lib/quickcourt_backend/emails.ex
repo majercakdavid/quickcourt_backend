@@ -18,7 +18,7 @@ defmodule QuickcourtBackend.Email do
       filename: "quickcourt_warning_letter_" <> claim.case_number <> ".pdf",
       data: warning_letter_pdf
     })
-    |> QuickcourtBackend.Mailer.deliver_now()
+    |> QuickcourtBackend.Mailer.deliver_later()
   end
 
   def send_warning_letter_defendant(claim, warning_letter_pdf) do
@@ -36,7 +36,7 @@ defmodule QuickcourtBackend.Email do
       filename: "quickcourt_warning_letter_" <> claim.case_number <> ".pdf",
       data: warning_letter_pdf
     })
-    |> QuickcourtBackend.Mailer.deliver_now()
+    |> QuickcourtBackend.Mailer.deliver_later()
   end
 
   def send_update_status_email(email_address, claim_identifier) do

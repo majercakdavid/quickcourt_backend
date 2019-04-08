@@ -95,9 +95,9 @@ defmodule QuickcourtBackend.Court do
       |> Repo.insert()
 
     case claim_res do
-      {:ok, new_claim} ->
+      {:ok, claim} ->
         claim =
-          Repo.preload(new_claim, [
+          Repo.preload(claim, [
             :claimant_country,
             :defendant_country,
             :purchase_country,
@@ -106,10 +106,28 @@ defmodule QuickcourtBackend.Court do
             :user
           ])
 
-        warning_letter_pdf = ClaimPdfGenerator.generate_warning_letter_pdf(claim)
-        Email.send_warning_letter_defendant(claim, warning_letter_pdf)
-        Email.send_warning_letter_claimant(claim, warning_letter_pdf)
-        {:ok, %{claim: claim, warning_letter_pdf: warning_letter_pdf}}
+        with [cr | []] <-
+               QuickcourtBackend.Court.get_claim_rules_by_codes(
+                 claim.agreement_type_code,
+                 claim.agreement_type_issue_code,
+                 claim.circumstances_invoked_code,
+                 claim.first_resolution_code,
+                 claim.second_resolution_code
+               ),
+             claim_map =
+               Map.from_struct(claim)
+               |> Map.put(:agreement_type, String.slice(cr.agreement_type, 3..-1))
+               |> Map.put(:agreement_type_issue, cr.agreement_type_issue)
+               |> Map.put(:circumstances_invoked, cr.circumstances_invoked)
+               |> Map.put(:first_resolution, cr.first_resolution)
+               |> Map.put(:second_resolution, cr.second_resolution),
+             warning_letter_pdf <- ClaimPdfGenerator.generate_warning_letter_pdf(claim_map) do
+          Email.send_warning_letter_defendant(claim, warning_letter_pdf)
+          Email.send_warning_letter_claimant(claim, warning_letter_pdf)
+          {:ok, %{claim: claim, warning_letter_pdf: warning_letter_pdf}}
+        else
+          _ -> {:error, "There was error while generating warning letter"}
+        end
 
       {:error, changeset} ->
         {:error, Map.get(changeset, :errors)}
@@ -131,19 +149,23 @@ defmodule QuickcourtBackend.Court do
   def update_claim(%Claim{} = claim, attrs) do
     with {:ok, claim} <- claim |> Claim.changeset(attrs) |> Repo.update(),
          claim <-
-           Repo.preload(claim, [
-             :claimant_country,
-             :defendant_country,
-             :purchase_country,
-             :delivery_country,
-             :claim_status,
-             :user
-           ], force: true) do
-             {:ok, claim}
-           else
-            {:error, changeset} ->
-              {:error, Map.get(changeset, :errors)}
-           end
+           Repo.preload(
+             claim,
+             [
+               :claimant_country,
+               :defendant_country,
+               :purchase_country,
+               :delivery_country,
+               :claim_status,
+               :user
+             ],
+             force: true
+           ) do
+      {:ok, claim}
+    else
+      {:error, changeset} ->
+        {:error, Map.get(changeset, :errors)}
+    end
   end
 
   @doc """
@@ -227,15 +249,14 @@ defmodule QuickcourtBackend.Court do
           distinct: cr.agreement_type,
           select: cr.agreement_type
       )
+      |> Enum.filter(fn agreement_type ->
+        String.slice(agreement_type, 0..1) != "->"
+      end)
 
     agreement_types
-    |> Enum.filter(fn agreement_type ->
-      String.slice(agreement_type, 0..1) != "->"
-    end)
     |> Enum.map(fn agreement_type ->
-      code = String.slice(agreement_type, 0..1)
       label = String.slice(agreement_type, 3..-1)
-      %{code: code, label: label}
+      %{code: agreement_type, label: label}
     end)
   end
 
@@ -243,12 +264,12 @@ defmodule QuickcourtBackend.Court do
   Returns the list of possible agreement_type_issues according
   to passed in agreement type.
   """
-  def list_agreement_type_issues(agreement_type) do
+  def list_agreement_type_issues(agreement_type_code) do
     claim_rules =
       Repo.all(
         from cr in "claim_rules",
           distinct: cr.agreement_type_issue,
-          where: cr.agreement_type == ^agreement_type,
+          where: cr.agreement_type == ^agreement_type_code,
           select: %{
             agreement_type: cr.agreement_type,
             agreement_type_issue: cr.agreement_type_issue
@@ -257,7 +278,7 @@ defmodule QuickcourtBackend.Court do
 
     claim_rules
     |> Enum.map(fn claim_rule ->
-      %{label: claim_rule.agreement_type_issue}
+      %{code: claim_rule.agreement_type_issue, label: claim_rule.agreement_type_issue}
     end)
   end
 
@@ -265,28 +286,25 @@ defmodule QuickcourtBackend.Court do
   Returns the list of possible circumstances invoked according
   to passed in agreement type and agreement type issue.
   """
-  def list_circumstances_invoked(agreement_type, agreement_type_issue) do
+  def list_circumstances_invoked(agreement_type_code, agreement_type_issue_code) do
     claim_rules =
       Repo.all(
         from cr in "claim_rules",
-          distinct: cr.circumstance_invoked,
+          distinct: cr.circumstances_invoked,
           where:
-            cr.agreement_type == ^agreement_type and
-              cr.agreement_type_issue == ^agreement_type_issue,
+            cr.agreement_type == ^agreement_type_code and
+              cr.agreement_type_issue == ^agreement_type_issue_code,
           select: %{
             agreement_type: cr.agreement_type,
             agreement_type_issue: cr.agreement_type_issue,
-            circumstance_invoked: cr.circumstance_invoked,
-            cicumstance_invoked_code: cr.cicumstance_invoked_code
+            circumstances_invoked: cr.circumstances_invoked,
+            circumstances_invoked_code: cr.circumstances_invoked_code
           }
       )
 
     claim_rules
     |> Enum.map(fn claim_rule ->
-      %{
-        label: claim_rule.circumstance_invoked,
-        code: claim_rule.cicumstance_invoked_code
-      }
+      %{code: claim_rule.circumstances_invoked_code, label: claim_rule.circumstances_invoked}
     end)
   end
 
@@ -294,20 +312,24 @@ defmodule QuickcourtBackend.Court do
   Returns the list of possible first resolutions according
   to passed in agreement type, agreement type issue and circumstances invoked.
   """
-  def list_first_resolutions(agreement_type, agreement_type_issue, circumstance_invoked) do
+  def list_first_resolutions(
+        agreement_type_code,
+        agreement_type_issue_code,
+        circumstances_invoked_code
+      ) do
     claim_rules =
       Repo.all(
         from cr in "claim_rules",
           distinct: cr.first_resolution,
           where:
-            cr.agreement_type == ^agreement_type and
-              cr.agreement_type_issue == ^agreement_type_issue and
-              cr.circumstance_invoked == ^circumstance_invoked,
+            cr.agreement_type == ^agreement_type_code and
+              cr.agreement_type_issue == ^agreement_type_issue_code and
+              cr.circumstances_invoked_code == ^circumstances_invoked_code,
           select: %{
             agreement_type: cr.agreement_type,
             agreement_type_issue: cr.agreement_type_issue,
-            circumstance_invoked: cr.circumstance_invoked,
-            cicumstance_invoked_code: cr.cicumstance_invoked_code,
+            circumstances_invoked: cr.circumstances_invoked,
+            circumstances_invoked_code: cr.circumstances_invoked_code,
             first_resolution: cr.first_resolution,
             first_resolution_code: cr.first_resolution_code
           }
@@ -315,10 +337,7 @@ defmodule QuickcourtBackend.Court do
 
     claim_rules
     |> Enum.map(fn claim_rule ->
-      %{
-        label: claim_rule.first_resolution,
-        code: claim_rule.first_resolution_code
-      }
+      %{code: claim_rule.first_resolution_code, label: claim_rule.first_resolution}
     end)
   end
 
@@ -326,20 +345,24 @@ defmodule QuickcourtBackend.Court do
   Returns the list of possible first resolutions according
   to passed in agreement type, agreement type issue and circumstances invoked.
   """
-  def list_second_resolutions(agreement_type, agreement_type_issue, circumstance_invoked) do
+  def list_second_resolutions(
+        agreement_type_code,
+        agreement_type_issue_code,
+        circumstances_invoked_code
+      ) do
     claim_rules =
       Repo.all(
         from cr in "claim_rules",
           distinct: cr.second_resolution,
           where:
-            cr.agreement_type == ^agreement_type and
-              cr.agreement_type_issue == ^agreement_type_issue and
-              cr.circumstance_invoked == ^circumstance_invoked,
+            cr.agreement_type == ^agreement_type_code and
+              cr.agreement_type_issue == ^agreement_type_issue_code and
+              cr.circumstances_invoked_code == ^circumstances_invoked_code,
           select: %{
             agreement_type: cr.agreement_type,
             agreement_type_issue: cr.agreement_type_issue,
-            circumstance_invoked: cr.circumstance_invoked,
-            cicumstance_invoked_code: cr.cicumstance_invoked_code,
+            circumstances_invoked: cr.circumstances_invoked,
+            circumstances_invoked_code: cr.circumstances_invoked_code,
             second_resolution: cr.second_resolution,
             second_resolution_code: cr.second_resolution_code
           }
@@ -349,10 +372,7 @@ defmodule QuickcourtBackend.Court do
     # If the second resolution is missing print out empty array instead of values set to nil
     |> Enum.filter(fn claim_rule -> claim_rule.second_resolution != nil end)
     |> Enum.map(fn claim_rule ->
-      %{
-        label: claim_rule.second_resolution,
-        code: claim_rule.second_resolution_code
-      }
+      %{code: claim_rule.second_resolution_code, label: claim_rule.second_resolution}
     end)
   end
 
@@ -371,6 +391,50 @@ defmodule QuickcourtBackend.Court do
 
   """
   def get_claim_rule!(id), do: Repo.get!(ClaimRule, id)
+
+  @doc """
+  Returns the list of claim_rules according to the provided codes.
+
+  ## Examples
+
+      iex> list_claim_rules()
+      [%ClaimRule{}, ...]
+
+  """
+  def get_claim_rules_by_codes(
+        agreement_type_code,
+        agreement_type_issue_code,
+        circumstances_invoked_code,
+        first_resolution_code,
+        nil
+      ) do
+    Repo.all(
+      from cr in ClaimRule,
+        where:
+          cr.agreement_type == ^agreement_type_code and
+            cr.agreement_type_issue == ^agreement_type_issue_code and
+            cr.circumstances_invoked_code == ^circumstances_invoked_code and
+            cr.first_resolution_code == ^first_resolution_code
+    )
+  end
+
+  def get_claim_rules_by_codes(
+        agreement_type_code,
+        agreement_type_issue_code,
+        circumstances_invoked_code,
+        first_resolution_code,
+        second_resolution_code
+      ) do
+    Repo.all(
+      from cr in ClaimRule,
+        where:
+          cr.agreement_type == ^agreement_type_code and
+            cr.agreement_type_issue == ^agreement_type_issue_code and
+            cr.circumstances_invoked_code == ^circumstances_invoked_code and
+            cr.first_resolution_code == ^first_resolution_code and
+            cr.second_resolution_code == ^second_resolution_code
+    )
+  end
 
   @doc """
   Creates a claim_rule.

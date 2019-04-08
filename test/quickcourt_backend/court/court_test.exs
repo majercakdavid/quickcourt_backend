@@ -68,8 +68,8 @@ defmodule QuickcourtBackend.CourtTest do
     @valid_attrs %{
       agreement_type: "some agreement_type",
       agreement_type_issue: "some agreement_type_issue",
-      cicumstance_invoked_code: "some cicumstance_invoked_code",
-      circumstance_invoked: "some circumstance_invoked",
+      circumstances_invoked_code: "some circumstances_invoked_code",
+      circumstances_invoked: "some circumstances_invoked",
       first_resolution: "some first_resolution",
       first_resolution_code: "some first_resolution_code",
       second_resolution: "some second_resolution",
@@ -78,8 +78,8 @@ defmodule QuickcourtBackend.CourtTest do
     @update_attrs %{
       agreement_type: "some updated agreement_type",
       agreement_type_issue: "some updated agreement_type_issue",
-      cicumstance_invoked_code: "some updated cicumstance_invoked_code",
-      circumstance_invoked: "some updated circumstance_invoked",
+      circumstances_invoked_code: "some updated circumstances_invoked_code",
+      circumstances_invoked: "some updated circumstances_invoked",
       first_resolution: "some updated first_resolution",
       first_resolution_code: "some updated first_resolution_code",
       second_resolution: "some updated second_resolution",
@@ -88,8 +88,8 @@ defmodule QuickcourtBackend.CourtTest do
     @invalid_attrs %{
       agreement_type: nil,
       agreement_type_issue: nil,
-      cicumstance_invoked_code: nil,
-      circumstance_invoked: nil,
+      circumstances_invoked_code: nil,
+      circumstances_invoked: nil,
       first_resolution: nil,
       first_resolution_code: nil,
       second_resolution: nil,
@@ -119,8 +119,8 @@ defmodule QuickcourtBackend.CourtTest do
       assert {:ok, %ClaimRule{} = claim_rule} = Court.create_claim_rule(@valid_attrs)
       assert claim_rule.agreement_type == "some agreement_type"
       assert claim_rule.agreement_type_issue == "some agreement_type_issue"
-      assert claim_rule.cicumstance_invoked_code == "some cicumstance_invoked_code"
-      assert claim_rule.circumstance_invoked == "some circumstance_invoked"
+      assert claim_rule.circumstances_invoked_code == "some circumstances_invoked_code"
+      assert claim_rule.circumstances_invoked == "some circumstances_invoked"
       assert claim_rule.first_resolution == "some first_resolution"
       assert claim_rule.first_resolution_code == "some first_resolution_code"
       assert claim_rule.second_resolution == "some second_resolution"
@@ -136,8 +136,8 @@ defmodule QuickcourtBackend.CourtTest do
       assert {:ok, %ClaimRule{} = claim_rule} = Court.update_claim_rule(claim_rule, @update_attrs)
       assert claim_rule.agreement_type == "some updated agreement_type"
       assert claim_rule.agreement_type_issue == "some updated agreement_type_issue"
-      assert claim_rule.cicumstance_invoked_code == "some updated cicumstance_invoked_code"
-      assert claim_rule.circumstance_invoked == "some updated circumstance_invoked"
+      assert claim_rule.circumstances_invoked_code == "some updated circumstances_invoked_code"
+      assert claim_rule.circumstances_invoked == "some updated circumstances_invoked"
       assert claim_rule.first_resolution == "some updated first_resolution"
       assert claim_rule.first_resolution_code == "some updated first_resolution_code"
       assert claim_rule.second_resolution == "some updated second_resolution"

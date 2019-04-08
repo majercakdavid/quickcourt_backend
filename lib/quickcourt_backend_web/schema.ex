@@ -19,31 +19,9 @@ defmodule QuickcourtBackendWeb.Schema do
     field :id, non_null(:id)
   end
 
-  object :agreement_type do
+  object :claim_rule do
     field :code, non_null(:string)
     field :label, non_null(:string)
-  end
-
-  object :agreement_type_issue do
-    field :label, non_null(:string)
-  end
-
-  object :circumstances_invoked do
-    field :code, non_null(:string)
-    field :label, non_null(:string)
-  end
-
-  object :resolution do
-    field :code, non_null(:string)
-    field :label, non_null(:string)
-  end
-
-  input_object :agreement_type_input do
-    field :id, non_null(:id)
-  end
-
-  input_object :issue_type_input do
-    field :id, non_null(:id)
   end
 
   object :claim do
@@ -68,7 +46,7 @@ defmodule QuickcourtBackendWeb.Schema do
     field :defendant_phone, non_null(:string)
     field :agreement_type, non_null(:string)
     field :agreement_type_issue, non_null(:string)
-    field :circumstance_invoked, non_null(:string)
+    field :circumstances_invoked, non_null(:string)
     field :first_resolution, non_null(:string)
     field :second_resolution, non_null(:string)
     field :purchase_country, :enumeration
@@ -122,32 +100,32 @@ defmodule QuickcourtBackendWeb.Schema do
       resolve(&SharedResolver.all_countries/3)
     end
 
-    field :agreement_types, non_null(list_of(non_null(:agreement_type))) do
+    field :agreement_types, non_null(list_of(non_null(:claim_rule))) do
       resolve(&CourtResolver.all_agreement_types/3)
     end
 
-    field :agreement_type_issues, non_null(list_of(non_null(:agreement_type_issue))) do
-      arg(:agreement_type, non_null(:string))
+    field :agreement_type_issues, non_null(list_of(non_null(:claim_rule))) do
+      arg(:agreement_type_code, non_null(:string))
       resolve(&CourtResolver.all_agreement_type_issues/3)
     end
 
-    field :circumstances_invoked, non_null(list_of(non_null(:circumstances_invoked))) do
-      arg(:agreement_type, non_null(:string))
-      arg(:agreement_type_issue, non_null(:string))
+    field :circumstances_invoked, non_null(list_of(non_null(:claim_rule))) do
+      arg(:agreement_type_code, non_null(:string))
+      arg(:agreement_type_issue_code, non_null(:string))
       resolve(&CourtResolver.all_circumstances_invoked/3)
     end
 
-    field :first_resolutions, non_null(list_of(non_null(:resolution))) do
-      arg(:agreement_type, non_null(:string))
-      arg(:agreement_type_issue, non_null(:string))
-      arg(:circumstance_invoked, non_null(:string))
+    field :first_resolutions, non_null(list_of(non_null(:claim_rule))) do
+      arg(:agreement_type_code, non_null(:string))
+      arg(:agreement_type_issue_code, non_null(:string))
+      arg(:circumstances_invoked_code, non_null(:string))
       resolve(&CourtResolver.all_first_resolutions/3)
     end
 
-    field :second_resolutions, non_null(list_of(non_null(:resolution))) do
-      arg(:agreement_type, non_null(:string))
-      arg(:agreement_type_issue, non_null(:string))
-      arg(:circumstance_invoked, non_null(:string))
+    field :second_resolutions, non_null(list_of(non_null(:claim_rule))) do
+      arg(:agreement_type_code, non_null(:string))
+      arg(:agreement_type_issue_code, non_null(:string))
+      arg(:circumstances_invoked_code, non_null(:string))
       resolve(&CourtResolver.all_second_resolutions/3)
     end
   end
@@ -193,12 +171,11 @@ defmodule QuickcourtBackendWeb.Schema do
       arg(:defendant_email, non_null(:string))
       arg(:claimant_phone, non_null(:string))
       arg(:defendant_phone, non_null(:string))
-      arg(:agreement_type, non_null(:string))
-      arg(:agreement_type_issue, non_null(:string))
-      arg(:circumstance_invoked, non_null(:string))
-
-      arg(:first_resolution, non_null(:string))
-      arg(:second_resolution, :string)
+      arg(:agreement_type_code, non_null(:string))
+      arg(:agreement_type_issue_code, non_null(:string))
+      arg(:circumstances_invoked_code, non_null(:string))
+      arg(:first_resolution_code, non_null(:string))
+      arg(:second_resolution_code, :string)
 
       arg(:purchase_country_id, :integer)
       arg(:purchase_date, non_null(:datetime))

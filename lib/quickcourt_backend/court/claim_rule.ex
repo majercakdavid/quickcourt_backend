@@ -5,8 +5,8 @@ defmodule QuickcourtBackend.Court.ClaimRule do
   schema "claim_rules" do
     field :agreement_type, :string
     field :agreement_type_issue, :string
-    field :circumstance_invoked, :string
-    field :cicumstance_invoked_code, :string
+    field :circumstances_invoked, :string
+    field :circumstances_invoked_code, :string
     field :first_resolution, :string
     field :first_resolution_code, :string
     field :second_resolution, :string
@@ -21,8 +21,8 @@ defmodule QuickcourtBackend.Court.ClaimRule do
     |> cast(attrs, [
       :agreement_type,
       :agreement_type_issue,
-      :cicumstance_invoked_code,
-      :circumstance_invoked,
+      :circumstances_invoked_code,
+      :circumstances_invoked,
       :first_resolution_code,
       :first_resolution,
       :second_resolution_code,
@@ -32,8 +32,8 @@ defmodule QuickcourtBackend.Court.ClaimRule do
     # |> validate_required([
     #   :agreement_type,
     #   :agreement_type_issue,
-    #   :cicumstance_invoked_code,
-    #   :circumstance_invoked,
+    #   :circumstances_invoked_code,
+    #   :circumstances_invoked,
     #   :first_resolution_code,
     #   :first_resolution,
     #   :second_resolution_code,
