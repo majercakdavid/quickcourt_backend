@@ -81,7 +81,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
       end
 
     claim
-    |> Enum.filter(fn {k, v} ->
+    |> Enum.filter(fn {k, _} ->
       !Enum.member?(["__meta__", "inserted_at", "updated_at", "user"], Atom.to_string(k))
     end)
     |> Enum.map(fn {k, v} ->
