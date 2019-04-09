@@ -82,14 +82,14 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
 
     claim
     |> Enum.filter(fn {k, v} ->
-      !Enum.member?(["__meta__", "inserted_at", "updated_at", "user"], Atom.to_string(k)) &&
-        v != nil
+      !Enum.member?(["__meta__", "inserted_at", "updated_at", "user"], Atom.to_string(k))
     end)
     |> Enum.map(fn {k, v} ->
       new_value =
         case v do
           %DateTime{} -> to_string(v)
           %{} -> to_string(v.name)
+          nil -> ""
           val -> to_string(val)
         end
 
