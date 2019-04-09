@@ -63,8 +63,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
       {:ok, filename} =
         PdfGenerator.generate(html, page_size: "A4", shell_params: ["--dpi", "300"])
 
-      {:ok, file_contents} = File.read(filename)
-      file_contents
+      File.read(filename)
     rescue
       e ->
         IO.puts("ERROR GENERATING PDF")
@@ -88,7 +87,8 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
       new_value =
         case v do
           %DateTime{} -> to_string(v)
-          %{} -> to_string(v.name)
+          %{name: name} -> name
+          %{label: label} -> label
           nil -> ""
           val -> to_string(val)
         end

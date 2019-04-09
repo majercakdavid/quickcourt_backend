@@ -1,6 +1,7 @@
 defmodule QuickcourtBackendWeb.CourtResolver do
   alias QuickcourtBackend.Court
   alias QuickcourtBackend.ClaimPdfGenerator
+  alias QuickcourtBackend.Email
 
   @type user_context() :: %{current_user: Auth.User}
 
@@ -15,8 +16,10 @@ defmodule QuickcourtBackendWeb.CourtResolver do
          true <- claim_belongs_to_user?(claim, user),
          true <- warning_expired?(claim),
          true <- can_be_updated?(claim),
-         {:ok, new_claim} <- Court.update_claim(claim, %{claim_status_id: 5}) do
-      {:ok, new_claim}
+         {:ok, new_claim} <- Court.update_claim(claim, %{claim_status_id: 5}),
+         claim_map <- Map.from_struct(new_claim),
+         {:ok, claim_map} <- merge_claim_rules(claim_map) do
+      {:ok, claim_map}
     else
       {:error, info} -> {:error, info}
     end
@@ -27,17 +30,21 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     case args
          |> Map.merge(%{user_id: user.id, claim_status_id: 1})
          |> Court.create_claim() do
-      {:ok, %{claim: claim, warning_letter_pdf: warning_letter_pdf}} ->
-        try do
-          result =
-            Map.from_struct(claim)
-            |> Map.merge(%{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})
+      {:ok, claim} ->
+        with claim_map <- Map.from_struct(claim),
+             {:ok, claim_map} <- merge_claim_rules(claim_map),
+             {:ok, claim_map} <- merge_warning_letter(claim_map) do
+          Email.send_warning_letter_defendant(claim_map, claim_map.pdf_base64_warning_letter)
+          Email.send_warning_letter_claimant(claim_map, claim_map.pdf_base64_warning_letter)
+
+          claim_map =
+            claim_map
             |> Map.merge(%{pdf_base64_small_claim_form: nil})
             |> Map.merge(%{pdf_base64_epo_a: nil})
 
-          {:ok, result}
-        rescue
-          RuntimeError -> {:error, "There was an error generating PDF document(s)"}
+          {:ok, claim_map}
+        else
+          {:error, e} -> {:error, e}
         end
 
       {:error, errors} ->
@@ -51,8 +58,10 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     claims =
       Court.list_user_claims(user.id)
       |> Enum.map(fn claim ->
-        with {:ok, claim} <- merge_warning_letter_if_necessary(claim, queried_fields) do
-          claim
+        with claim_map <- Map.from_struct(claim),
+             {:ok, claim_map} <- merge_claim_rules(claim_map),
+             {:ok, claim_map} <- merge_warning_letter_if_necessary(claim_map, queried_fields) do
+          claim_map
           |> Map.merge(%{pdf_base64_small_claim_form: nil})
           |> Map.merge(%{pdf_base64_epo_a: nil})
         else
@@ -69,14 +78,15 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     claim = Court.get_claim!(claim_id)
 
     with true <- claim_belongs_to_user?(claim, user),
-         {:ok, claim} <- merge_warning_letter_if_necessary(claim, queried_fields) do
-
-      claim =
-        claim
+         claim_map <- Map.from_struct(claim),
+         {:ok, claim_map} <- merge_claim_rules(claim_map),
+         {:ok, claim_map} <- merge_warning_letter_if_necessary(claim_map, queried_fields) do
+      claim_map =
+        claim_map
         |> Map.merge(%{pdf_base64_small_claim_form: nil})
         |> Map.merge(%{pdf_base64_epo_a: nil})
 
-      {:ok, claim}
+      {:ok, claim_map}
     else
       {:error, e} ->
         {:error, e}
@@ -168,33 +178,67 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     end
   end
 
-  defp merge_warning_letter_if_necessary(claim, queried_fields) do
-    case(Enum.member?(queried_fields, "pdfBase64WarningLetter")) do
-      true ->
-        with [cr | []] <-
-               QuickcourtBackend.Court.get_claim_rules_by_codes(
-                 claim.agreement_type_code,
-                 claim.agreement_type_issue_code,
-                 claim.circumstances_invoked_code,
-                 claim.first_resolution_code,
-                 claim.second_resolution_code
-               ),
-             claim_map =
-               Map.from_struct(claim)
-               |> Map.put(:agreement_type, String.slice(cr.agreement_type, 3..-1))
-               |> Map.put(:agreement_type_issue, cr.agreement_type_issue)
-               |> Map.put(:circumstances_invoked, cr.circumstances_invoked)
-               |> Map.put(:first_resolution, cr.first_resolution)
-               |> Map.put(:second_resolution, cr.second_resolution),
-             warning_letter_pdf <- ClaimPdfGenerator.generate_warning_letter_pdf(claim_map) do
-          {:ok, Map.merge(claim, %{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})}
-        else
-          e ->
-            {:error, "There was an error generating warning letter"}
+  defp merge_claim_rules(claim_map) do
+    with [cr | []] <-
+           QuickcourtBackend.Court.get_claim_rules_by_codes(
+             claim_map.agreement_type_code,
+             claim_map.agreement_type_issue_code,
+             claim_map.circumstances_invoked_code,
+             claim_map.first_resolution_code,
+             claim_map.second_resolution_code
+           ) do
+      claim_map =
+        claim_map
+        |> Map.put(:agreement_type, %{
+          label: String.slice(cr.agreement_type, 3..-1),
+          code: cr.agreement_type
+        })
+        |> Map.put(:agreement_type_issue, %{
+          label: cr.agreement_type_issue,
+          code: claim_map.agreement_type_issue_code
+        })
+        |> Map.put(:circumstances_invoked, %{
+          label: cr.circumstances_invoked,
+          code: claim_map.circumstances_invoked_code
+        })
+        |> Map.put(:first_resolution, %{
+          label: cr.first_resolution,
+          code: claim_map.first_resolution_code
+        })
+
+      claim_map =
+        case claim_map.second_resolution_code != nil do
+          true ->
+            Map.put(claim_map, :second_resolution, %{
+              label: cr.second_resolution,
+              code: claim_map.second_resolution_code
+            })
+
+          _ ->
+            Map.put(claim_map, :second_resolution, nil)
         end
 
+      {:ok, claim_map}
+    else
+      _ -> {:error, "There was an error retrieving claim rules"}
+    end
+  end
+
+  defp merge_warning_letter_if_necessary(claim_map, queried_fields) do
+    case(Enum.member?(queried_fields, "pdfBase64WarningLetter")) do
+      true ->
+        merge_warning_letter(claim_map)
+
       _ ->
-        {:ok, claim}
+        {:ok, claim_map}
+    end
+  end
+
+  defp merge_warning_letter(claim_map) do
+    with {:ok, warning_letter_pdf} <- ClaimPdfGenerator.generate_warning_letter_pdf(claim_map) do
+      {:ok, Map.merge(claim_map, %{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})}
+    else
+      e -> {:error, "There was an error generating warning letter. " <> IO.inspect(e)}
     end
   end
 end
