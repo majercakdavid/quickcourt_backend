@@ -8,8 +8,6 @@ defmodule QuickcourtBackend.Court do
 
   alias QuickcourtBackend.Court.Claim
   alias QuickcourtBackend.Court.ClaimStatus
-  alias QuickcourtBackend.ClaimPdfGenerator
-  alias QuickcourtBackend.Email
 
   @doc """
   Returns the list of claims.
@@ -106,28 +104,7 @@ defmodule QuickcourtBackend.Court do
             :user
           ])
 
-        with [cr | []] <-
-               QuickcourtBackend.Court.get_claim_rules_by_codes(
-                 claim.agreement_type_code,
-                 claim.agreement_type_issue_code,
-                 claim.circumstances_invoked_code,
-                 claim.first_resolution_code,
-                 claim.second_resolution_code
-               ),
-             claim_map =
-               Map.from_struct(claim)
-               |> Map.put(:agreement_type, String.slice(cr.agreement_type, 3..-1))
-               |> Map.put(:agreement_type_issue, cr.agreement_type_issue)
-               |> Map.put(:circumstances_invoked, cr.circumstances_invoked)
-               |> Map.put(:first_resolution, cr.first_resolution)
-               |> Map.put(:second_resolution, cr.second_resolution),
-             warning_letter_pdf <- ClaimPdfGenerator.generate_warning_letter_pdf(claim_map) do
-          Email.send_warning_letter_defendant(claim, warning_letter_pdf)
-          Email.send_warning_letter_claimant(claim, warning_letter_pdf)
-          {:ok, %{claim: claim, warning_letter_pdf: warning_letter_pdf}}
-        else
-          _ -> {:error, "There was error while generating warning letter"}
-        end
+        {:ok, claim}
 
       {:error, changeset} ->
         {:error, Map.get(changeset, :errors)}
