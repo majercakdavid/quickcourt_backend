@@ -51,9 +51,13 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     claims =
       Court.list_user_claims(user.id)
       |> Enum.map(fn claim ->
-        merge_warning_letter_if_necessary(claim, queried_fields)
-        |> Map.merge(%{pdf_base64_small_claim_form: nil})
-        |> Map.merge(%{pdf_base64_epo_a: nil})
+        with {:ok, claim} <- merge_warning_letter_if_necessary(claim, queried_fields) do
+          claim
+          |> Map.merge(%{pdf_base64_small_claim_form: nil})
+          |> Map.merge(%{pdf_base64_epo_a: nil})
+        else
+          {:error, e} -> {:error, e}
+        end
       end)
 
     {:ok, claims}
@@ -65,7 +69,8 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     claim = Court.get_claim!(claim_id)
 
     with true <- claim_belongs_to_user?(claim, user),
-         claim <- merge_warning_letter_if_necessary(claim, queried_fields) do
+         {:ok, claim} <- merge_warning_letter_if_necessary(claim, queried_fields) do
+
       claim =
         claim
         |> Map.merge(%{pdf_base64_small_claim_form: nil})
@@ -73,7 +78,8 @@ defmodule QuickcourtBackendWeb.CourtResolver do
 
       {:ok, claim}
     else
-      _ -> {:error, "Unathorized"}
+      {:error, e} ->
+        {:error, e}
     end
   end
 
@@ -181,13 +187,14 @@ defmodule QuickcourtBackendWeb.CourtResolver do
                |> Map.put(:first_resolution, cr.first_resolution)
                |> Map.put(:second_resolution, cr.second_resolution),
              warning_letter_pdf <- ClaimPdfGenerator.generate_warning_letter_pdf(claim_map) do
-          Map.merge(claim, %{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})
+          {:ok, Map.merge(claim, %{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})}
         else
-          _ -> {:error, "There was an error generating warning letter"}
+          e ->
+            {:error, "There was an error generating warning letter"}
         end
 
       _ ->
-        claim
+        {:ok, claim}
     end
   end
 end

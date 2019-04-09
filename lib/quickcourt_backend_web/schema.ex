@@ -44,11 +44,11 @@ defmodule QuickcourtBackendWeb.Schema do
     field :defendant_email, non_null(:string)
     field :claimant_phone, non_null(:string)
     field :defendant_phone, non_null(:string)
-    field :agreement_type, non_null(:string)
-    field :agreement_type_issue, non_null(:string)
-    field :circumstances_invoked, non_null(:string)
-    field :first_resolution, non_null(:string)
-    field :second_resolution, non_null(:string)
+    field :agreement_type_code, non_null(:string)
+    field :agreement_type_issue_code, non_null(:string)
+    field :circumstances_invoked_code, non_null(:string)
+    field :first_resolution_code, non_null(:string)
+    field :second_resolution_code, non_null(:string)
     field :purchase_country, :enumeration
     field :purchase_date, non_null(:datetime)
     field :delivery_country, :enumeration
