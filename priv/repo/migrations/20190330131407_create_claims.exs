@@ -20,11 +20,11 @@ defmodule QuickcourtBackend.Repo.Migrations.CreateClaims do
       add :defendant_email, :string
       add :claimant_phone, :string
       add :defendant_phone, :string
-      add :agreement_type_code, :string
-      add :agreement_type_issue_code, :string
-      add :circumstances_invoked_code, :string
-      add :first_resolution_code, :string
-      add :second_resolution_code, :string
+      add :agreement_type_label, :string
+      add :agreement_type_issue_label, :string
+      add :circumstances_invoked_label, :string
+      add :first_resolution_label, :string
+      add :second_resolution_label, :string
       add :purchase_country_id, references(:countries), default: nil
       add :purchase_date, :utc_datetime
       add :delivery_country_id, references(:countries), default: nil

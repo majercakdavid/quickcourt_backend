@@ -110,39 +110,39 @@ defmodule QuickcourtBackendWeb.Schema do
     end
 
     field :agreement_type_issues, non_null(list_of(non_null(:claim_rule))) do
-      arg(:agreement_type_code, non_null(:string))
+      arg(:agreement_type_label, non_null(:string))
       resolve(&CourtResolver.all_agreement_type_issues/3)
     end
 
     field :claimant_description, :string do
-      arg(:agreement_type_code, non_null(:string))
-      arg(:agreement_type_issue_code, non_null(:string))
+      arg(:agreement_type_label, non_null(:string))
+      arg(:agreement_type_issue_label, non_null(:string))
       resolve(&CourtResolver.get_claimant_description/3)
     end
 
     field :defendant_description, :string do
-      arg(:agreement_type_code, non_null(:string))
-      arg(:agreement_type_issue_code, non_null(:string))
+      arg(:agreement_type_label, non_null(:string))
+      arg(:agreement_type_issue_label, non_null(:string))
       resolve(&CourtResolver.get_defendant_description/3)
     end
 
     field :circumstances_invoked, non_null(list_of(non_null(:claim_rule))) do
-      arg(:agreement_type_code, non_null(:string))
-      arg(:agreement_type_issue_code, non_null(:string))
+      arg(:agreement_type_label, non_null(:string))
+      arg(:agreement_type_issue_label, non_null(:string))
       resolve(&CourtResolver.all_circumstances_invoked/3)
     end
 
     field :first_resolutions, non_null(list_of(non_null(:claim_rule))) do
-      arg(:agreement_type_code, non_null(:string))
-      arg(:agreement_type_issue_code, non_null(:string))
-      arg(:circumstances_invoked_code, non_null(:string))
+      arg(:agreement_type_label, non_null(:string))
+      arg(:agreement_type_issue_label, non_null(:string))
+      arg(:circumstances_invoked_label, non_null(:string))
       resolve(&CourtResolver.all_first_resolutions/3)
     end
 
     field :second_resolutions, non_null(list_of(non_null(:claim_rule))) do
-      arg(:agreement_type_code, non_null(:string))
-      arg(:agreement_type_issue_code, non_null(:string))
-      arg(:circumstances_invoked_code, non_null(:string))
+      arg(:agreement_type_label, non_null(:string))
+      arg(:agreement_type_issue_label, non_null(:string))
+      arg(:circumstances_invoked_label, non_null(:string))
       resolve(&CourtResolver.all_second_resolutions/3)
     end
   end
@@ -188,11 +188,11 @@ defmodule QuickcourtBackendWeb.Schema do
       arg(:defendant_email, non_null(:string))
       arg(:claimant_phone, non_null(:string))
       arg(:defendant_phone, non_null(:string))
-      arg(:agreement_type_code, non_null(:string))
-      arg(:agreement_type_issue_code, non_null(:string))
-      arg(:circumstances_invoked_code, non_null(:string))
-      arg(:first_resolution_code, non_null(:string))
-      arg(:second_resolution_code, :string)
+      arg(:agreement_type_label, non_null(:string))
+      arg(:agreement_type_issue_label, non_null(:string))
+      arg(:circumstances_invoked_label, non_null(:string))
+      arg(:first_resolution_label, non_null(:string))
+      arg(:second_resolution_label, :string)
 
       arg(:purchase_country_id, :integer)
       arg(:purchase_date, non_null(:datetime))
