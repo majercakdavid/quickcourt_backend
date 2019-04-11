@@ -358,7 +358,8 @@ defmodule QuickcourtBackend.Court do
   def list_second_resolutions(
         agreement_type_label,
         agreement_type_issue_label,
-        circumstances_invoked_label
+        circumstances_invoked_label,
+        first_resolution_label
       ) do
     claim_rules =
       Repo.all(
@@ -367,7 +368,8 @@ defmodule QuickcourtBackend.Court do
           where:
             cr.agreement_type == ^agreement_type_label and
               cr.agreement_type_issue == ^agreement_type_issue_label and
-              cr.circumstances_invoked == ^circumstances_invoked_label,
+              cr.circumstances_invoked == ^circumstances_invoked_label and
+              cr.first_resolution == ^first_resolution_label,
           select: %{
             agreement_type: cr.agreement_type,
             agreement_type_issue: cr.agreement_type_issue,
