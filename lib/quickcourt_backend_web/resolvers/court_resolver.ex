@@ -11,14 +11,19 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   end
 
   @spec update_claim_status(any(), any(), user_context()) :: any()
-  def update_claim_status(_root, %{id: claim_id}, _info = %{context: %{current_user: user}}) do
+  def update_claim_status(_root, %{id: claim_id}, info = %{context: %{current_user: user}}) do
+    queried_fields = Absinthe.Resolution.project(info) |> Enum.map(& &1.name)
+
     with claim <- Court.get_claim!(claim_id),
          true <- claim_belongs_to_user?(claim, user),
          true <- warning_expired?(claim),
          true <- can_be_updated?(claim),
          {:ok, new_claim} <- Court.update_claim(claim, %{claim_status_id: 5}),
          claim_map <- Map.from_struct(new_claim),
-         {:ok, claim_map} <- merge_claim_rules(claim_map) do
+         {:ok, claim_map} <- merge_claim_rules(claim_map),
+         {:ok, claim_map} <- merge_warning_letter_if_necessary(claim_map, queried_fields),
+         {:ok, claim_map} <- merge_small_claim_form_if_necessary(claim_map, queried_fields),
+         {:ok, claim_map} <- merge_epo_a_if_necessary(claim_map, queried_fields) do
       {:ok, claim_map}
     else
       {:error, info} -> {:error, info}
@@ -26,21 +31,25 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   end
 
   @spec create_claim(any(), any(), user_context()) :: any()
-  def create_claim(_root, args, %{context: %{current_user: user}}) do
+  def create_claim(_root, args, info = %{context: %{current_user: user}}) do
+    queried_fields = Absinthe.Resolution.project(info) |> Enum.map(& &1.name)
+
     case args
          |> Map.merge(%{user_id: user.id, claim_status_id: 1})
          |> Court.create_claim() do
       {:ok, claim} ->
         with claim_map <- Map.from_struct(claim),
              {:ok, claim_map} <- merge_claim_rules(claim_map),
-             {:ok, claim_map} <- merge_warning_letter(claim_map) do
+             {:ok, claim_map} <- merge_warning_letter(claim_map),
+             {:ok, claim_map} <- merge_small_claim_form_if_necessary(claim_map, queried_fields),
+             {:ok, claim_map} <- merge_epo_a_if_necessary(claim_map, queried_fields) do
           Email.send_warning_letter_defendant(claim_map, claim_map.pdf_base64_warning_letter)
           Email.send_warning_letter_claimant(claim_map, claim_map.pdf_base64_warning_letter)
 
-          claim_map =
-            claim_map
-            |> Map.merge(%{pdf_base64_small_claim_form: nil})
-            |> Map.merge(%{pdf_base64_epo_a: nil})
+          # claim_map =
+          #   claim_map
+          #   |> Map.merge(%{pdf_base64_small_claim_form: nil})
+          #   |> Map.merge(%{pdf_base64_epo_a: nil})
 
           {:ok, claim_map}
         else
@@ -60,10 +69,12 @@ defmodule QuickcourtBackendWeb.CourtResolver do
       |> Enum.map(fn claim ->
         with claim_map <- Map.from_struct(claim),
              {:ok, claim_map} <- merge_claim_rules(claim_map),
-             {:ok, claim_map} <- merge_warning_letter_if_necessary(claim_map, queried_fields) do
+             {:ok, claim_map} <- merge_warning_letter_if_necessary(claim_map, queried_fields),
+             {:ok, claim_map} <- merge_small_claim_form_if_necessary(claim_map, queried_fields),
+             {:ok, claim_map} <- merge_epo_a_if_necessary(claim_map, queried_fields) do
           claim_map
-          |> Map.merge(%{pdf_base64_small_claim_form: nil})
-          |> Map.merge(%{pdf_base64_epo_a: nil})
+          # |> Map.merge(%{pdf_base64_small_claim_form: nil})
+          # |> Map.merge(%{pdf_base64_epo_a: nil})
         else
           {:error, e} -> {:error, e}
         end
@@ -75,16 +86,20 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   def get_claim(_root, %{id: claim_id}, info = %{context: %{current_user: user}}) do
     queried_fields = Absinthe.Resolution.project(info) |> Enum.map(& &1.name)
 
+    IO.inspect queried_fields
+
     claim = Court.get_claim!(claim_id)
 
     with true <- claim_belongs_to_user?(claim, user),
          claim_map <- Map.from_struct(claim),
          {:ok, claim_map} <- merge_claim_rules(claim_map),
-         {:ok, claim_map} <- merge_warning_letter_if_necessary(claim_map, queried_fields) do
-      claim_map =
-        claim_map
-        |> Map.merge(%{pdf_base64_small_claim_form: nil})
-        |> Map.merge(%{pdf_base64_epo_a: nil})
+         {:ok, claim_map} <- merge_warning_letter_if_necessary(claim_map, queried_fields),
+         {:ok, claim_map} <- merge_small_claim_form_if_necessary(claim_map, queried_fields),
+         {:ok, claim_map} <- merge_epo_a_if_necessary(claim_map, queried_fields) do
+      # claim_map =
+      #   claim_map
+      #   |> Map.merge(%{pdf_base64_small_claim_form: nil})
+      #   |> Map.merge(%{pdf_base64_epo_a: nil})
 
       {:ok, claim_map}
     else
@@ -221,6 +236,38 @@ defmodule QuickcourtBackendWeb.CourtResolver do
       {:ok, claim_map}
     else
       _ -> {:error, "There was an error retrieving claim rules"}
+    end
+  end
+
+  defp merge_small_claim_form_if_necessary(claim_map, queried_fields) do
+    case(Enum.member?(queried_fields, "pdfBase64SmallClaimForm")) do
+      true ->
+        with {:ok, small_claim_form_pdf} <-
+               ClaimPdfGenerator.generate_small_claim_form_pdf(claim_map) do
+          {:ok,
+           Map.merge(claim_map, %{
+             pdf_base64_small_claim_form: Base.encode64(small_claim_form_pdf)
+           })}
+        else
+          e -> {:error, "There was an error generating small claim form. " <> IO.inspect(e)}
+        end
+
+      _ ->
+        {:ok, claim_map}
+    end
+  end
+
+  defp merge_epo_a_if_necessary(claim_map, queried_fields) do
+    case(Enum.member?(queried_fields, "pdfBase64EpoA")) do
+      true ->
+        with {:ok, epo_a_pdf} <- ClaimPdfGenerator.generate_epo_a_pdf(claim_map) do
+          {:ok, Map.merge(claim_map, %{pdf_base64_epo_a: Base.encode64(epo_a_pdf)})}
+        else
+          e -> {:error, "There was an error generating small claim form. " <> IO.inspect(e)}
+        end
+
+      _ ->
+        {:ok, claim_map}
     end
   end
 

@@ -38,9 +38,16 @@ defmodule QuickcourtBackend.Court.Claim do
     field :purchase_date, :utc_datetime
     belongs_to :delivery_country, Country
     field :delivery_date, :utc_datetime
+
     field :lack_discovery_date, :utc_datetime
-    field :genus_description, :string
-    field :species_description, :string
+    field :contract_cancellation_date, :utc_datetime
+    field :goods_return_date, :utc_datetime
+    field :issue_description, :string
+    field :type_of_service_or_goods, :string
+
+    field :damages_description, :string
+    field :species_damages_description, :string
+
     field :claim_for_money, :boolean, default: false
     field :amount, :float, default: nil
     field :currency, :string, default: nil
@@ -83,6 +90,8 @@ defmodule QuickcourtBackend.Court.Claim do
       :delivery_country_id,
       :delivery_date,
       :lack_discovery_date,
+      :contract_cancellation_date,
+      :goods_return_date,
       :claimant_country_id,
       :defendant_country_id,
       :agreement_type_code,
@@ -90,8 +99,10 @@ defmodule QuickcourtBackend.Court.Claim do
       :circumstances_invoked_code,
       :first_resolution_code,
       :second_resolution_code,
-      :genus_description,
-      :species_description,
+      :issue_description,
+      :type_of_service_or_goods,
+      :damages_description,
+      :species_damages_description,
       :claim_for_money,
       :amount,
       :currency,
@@ -119,13 +130,16 @@ defmodule QuickcourtBackend.Court.Claim do
       :delivery_country_id,
       :delivery_date,
       :lack_discovery_date,
+      :contract_cancellation_date,
       :claimant_country_id,
       :defendant_country_id,
       :agreement_type_code,
       :agreement_type_issue_code,
       :circumstances_invoked_code,
       :first_resolution_code,
-      :genus_description,
+      :issue_description,
+      :type_of_service_or_goods,
+      :damages_description,
       :claim_for_money,
       :amount,
       :currency,

@@ -29,10 +29,15 @@ defmodule QuickcourtBackend.Repo.Migrations.CreateClaims do
       add :purchase_date, :utc_datetime
       add :delivery_country_id, references(:countries), default: nil
       add :delivery_date, :utc_datetime
-      add :lack_discovery_date, :utc_datetime
 
-      add :genus_description, :text
-      add :species_description, :text
+      add :lack_discovery_date, :utc_datetime
+      add :contract_cancellation_date, :utc_datetime
+      add :goods_return_date, :utc_datetime
+      add :issue_description, :text
+      add :type_of_service_or_goods, :string
+
+      add :damages_description, :text
+      add :species_damages_description, :text
 
       add :claim_for_money, :boolean, default: false
       add :amount, :float, default: nil

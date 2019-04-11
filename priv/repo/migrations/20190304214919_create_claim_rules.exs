@@ -5,6 +5,8 @@ defmodule QuickcourtBackend.Repo.Migrations.CreateClaimRules do
     create table(:claim_rules) do
       add :agreement_type, :string
       add :agreement_type_issue, :string
+      add :claimant_description, :text
+      add :defendant_description, :text
       add :circumstances_invoked_code, :string
       add :circumstances_invoked, :string
       add :first_resolution_code, :string

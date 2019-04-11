@@ -53,10 +53,15 @@ defmodule QuickcourtBackendWeb.Schema do
     field :purchase_date, non_null(:datetime)
     field :delivery_country, :enumeration
     field :delivery_date, non_null(:datetime)
-    field :lack_discovery_date, non_null(:datetime)
 
-    field :genus_description, non_null(:string)
-    field :species_description, :string
+    field :lack_discovery_date, non_null(:datetime)
+    field :contract_cancellation_date, non_null(:datetime)
+    field :goods_return_date, :datetime
+    field(:issue_description, non_null(:string))
+    field(:type_of_service_or_goods, non_null(:string))
+
+    field(:damages_description, non_null(:string))
+    field(:species_damages_description, :string)
 
     field :claim_for_money, non_null(:boolean)
     field :amount, non_null(:float)
@@ -181,10 +186,15 @@ defmodule QuickcourtBackendWeb.Schema do
       arg(:purchase_date, non_null(:datetime))
       arg(:delivery_country_id, :integer)
       arg(:delivery_date, non_null(:datetime))
-      arg(:lack_discovery_date, non_null(:datetime))
 
-      arg(:genus_description, non_null(:string))
-      arg(:species_description, non_null(:string))
+      arg(:lack_discovery_date, non_null(:datetime))
+      arg(:contract_cancellation_date, non_null(:datetime))
+      arg(:goods_return_date, :datetime)
+
+      arg(:issue_description, non_null(:string))
+      arg(:type_of_service_or_goods, non_null(:string))
+      arg(:damages_description, non_null(:string))
+      arg(:species_damages_description, :string)
 
       arg(:claim_for_money, non_null(:boolean))
       arg(:amount, non_null(:float))
