@@ -306,7 +306,7 @@ defmodule QuickcourtBackendWeb.CourtResolver do
 
     case(Enum.member?(queried_fields, "pdfBase64WarningLetter")) do
       true ->
-        with {:ok, claim_map} = merge_warning_letter(claim_map) do
+        with {:ok, claim_map} <- merge_warning_letter(claim_map) do
           claim_map =
             Map.replace!(
               claim_map,
