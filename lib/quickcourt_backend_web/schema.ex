@@ -143,6 +143,7 @@ defmodule QuickcourtBackendWeb.Schema do
       arg(:agreement_type_label, non_null(:string))
       arg(:agreement_type_issue_label, non_null(:string))
       arg(:circumstances_invoked_label, non_null(:string))
+      arg(:first_resolution_label, non_null(:string))
       resolve(&CourtResolver.all_second_resolutions/3)
     end
   end

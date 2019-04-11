@@ -186,7 +186,8 @@ defmodule QuickcourtBackendWeb.CourtResolver do
         %{
           agreement_type_label: agreement_type_label,
           agreement_type_issue_label: agreement_type_issue_label,
-          circumstances_invoked_label: circumstances_invoked_label
+          circumstances_invoked_label: circumstances_invoked_label,
+          first_resolution_label: first_resolution_label
         },
         _info
       ) do
@@ -194,7 +195,8 @@ defmodule QuickcourtBackendWeb.CourtResolver do
       Court.list_second_resolutions(
         agreement_type_label,
         agreement_type_issue_label,
-        circumstances_invoked_label
+        circumstances_invoked_label,
+        first_resolution_label
       )
 
     {:ok, second_resolutions}
