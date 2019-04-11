@@ -43,13 +43,22 @@ defmodule QuickcourtBackendWeb.CourtResolver do
              {:ok, claim_map} <- merge_warning_letter(claim_map),
              {:ok, claim_map} <- merge_small_claim_form_if_necessary(claim_map, queried_fields),
              {:ok, claim_map} <- merge_epo_a_if_necessary(claim_map, queried_fields) do
-          Email.send_warning_letter_defendant(claim_map, claim_map.pdf_base64_warning_letter)
-          Email.send_warning_letter_claimant(claim_map, claim_map.pdf_base64_warning_letter)
+          Email.send_warning_letter_defendant(
+            claim_map,
+            claim_map.pdf_base64_warning_letter
+          )
 
-          # claim_map =
-          #   claim_map
-          #   |> Map.merge(%{pdf_base64_small_claim_form: nil})
-          #   |> Map.merge(%{pdf_base64_epo_a: nil})
+          Email.send_warning_letter_claimant(
+            claim_map,
+            claim_map.pdf_base64_warning_letter
+          )
+
+          claim_map =
+            claim_map
+            |> Map.replace!(
+              :pdf_base64_warning_letter,
+              Base.encode64(claim_map.pdf_base64_warning_letter)
+            )
 
           {:ok, claim_map}
         else
@@ -94,11 +103,6 @@ defmodule QuickcourtBackendWeb.CourtResolver do
          {:ok, claim_map} <- merge_warning_letter_if_necessary(claim_map, queried_fields),
          {:ok, claim_map} <- merge_small_claim_form_if_necessary(claim_map, queried_fields),
          {:ok, claim_map} <- merge_epo_a_if_necessary(claim_map, queried_fields) do
-      # claim_map =
-      #   claim_map
-      #   |> Map.merge(%{pdf_base64_small_claim_form: nil})
-      #   |> Map.merge(%{pdf_base64_epo_a: nil})
-
       {:ok, claim_map}
     else
       {:error, e} ->
@@ -111,21 +115,21 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     {:ok, agreement_types}
   end
 
-  def all_agreement_type_issues(_root, %{agreement_type_code: agreement_type_code}, _info) do
-    agreement_type_issues = Court.list_agreement_type_issues(agreement_type_code)
+  def all_agreement_type_issues(_root, %{agreement_type_label: agreement_type_label}, _info) do
+    agreement_type_issues = Court.list_agreement_type_issues(agreement_type_label)
     {:ok, agreement_type_issues}
   end
 
   def get_claimant_description(
         _root,
         %{
-          agreement_type_code: agreement_type_code,
-          agreement_type_issue_code: agreement_type_issue_code
+          agreement_type_label: agreement_type_label,
+          agreement_type_issue_label: agreement_type_issue_label
         },
         _info
       ) do
     claimant_description =
-      Court.get_claimant_description(agreement_type_code, agreement_type_issue_code)
+      Court.get_claimant_description(agreement_type_label, agreement_type_issue_label)
 
     {:ok, claimant_description}
   end
@@ -133,13 +137,13 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   def get_defendant_description(
         _root,
         %{
-          agreement_type_code: agreement_type_code,
-          agreement_type_issue_code: agreement_type_issue_code
+          agreement_type_label: agreement_type_label,
+          agreement_type_issue_label: agreement_type_issue_label
         },
         _info
       ) do
     defendant_description =
-      Court.get_defendant_description(agreement_type_code, agreement_type_issue_code)
+      Court.get_defendant_description(agreement_type_label, agreement_type_issue_label)
 
     {:ok, defendant_description}
   end
@@ -147,13 +151,13 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   def all_circumstances_invoked(
         _root,
         %{
-          agreement_type_code: agreement_type_code,
-          agreement_type_issue_code: agreement_type_issue_code
+          agreement_type_label: agreement_type_label,
+          agreement_type_issue_label: agreement_type_issue_label
         },
         _info
       ) do
     agreement_type_issues =
-      Court.list_circumstances_invoked(agreement_type_code, agreement_type_issue_code)
+      Court.list_circumstances_invoked(agreement_type_label, agreement_type_issue_label)
 
     {:ok, agreement_type_issues}
   end
@@ -161,17 +165,17 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   def all_first_resolutions(
         _root,
         %{
-          agreement_type_code: agreement_type_code,
-          agreement_type_issue_code: agreement_type_issue_code,
-          circumstances_invoked_code: circumstances_invoked_code
+          agreement_type_label: agreement_type_label,
+          agreement_type_issue_label: agreement_type_issue_label,
+          circumstances_invoked_label: circumstances_invoked_label
         },
         _info
       ) do
     first_resolutions =
       Court.list_first_resolutions(
-        agreement_type_code,
-        agreement_type_issue_code,
-        circumstances_invoked_code
+        agreement_type_label,
+        agreement_type_issue_label,
+        circumstances_invoked_label
       )
 
     {:ok, first_resolutions}
@@ -180,17 +184,17 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   def all_second_resolutions(
         _root,
         %{
-          agreement_type_code: agreement_type_code,
-          agreement_type_issue_code: agreement_type_issue_code,
-          circumstances_invoked_code: circumstances_invoked_code
+          agreement_type_label: agreement_type_label,
+          agreement_type_issue_label: agreement_type_issue_label,
+          circumstances_invoked_label: circumstances_invoked_label
         },
         _info
       ) do
     second_resolutions =
       Court.list_second_resolutions(
-        agreement_type_code,
-        agreement_type_issue_code,
-        circumstances_invoked_code
+        agreement_type_label,
+        agreement_type_issue_label,
+        circumstances_invoked_label
       )
 
     {:ok, second_resolutions}
@@ -221,12 +225,12 @@ defmodule QuickcourtBackendWeb.CourtResolver do
 
   defp merge_claim_rules(claim_map) do
     with [cr | []] <-
-           QuickcourtBackend.Court.get_claim_rules_by_codes(
-             claim_map.agreement_type_code,
-             claim_map.agreement_type_issue_code,
-             claim_map.circumstances_invoked_code,
-             claim_map.first_resolution_code,
-             claim_map.second_resolution_code
+           QuickcourtBackend.Court.get_claim_rules_by_labels(
+             claim_map.agreement_type_label,
+             claim_map.agreement_type_issue_label,
+             claim_map.circumstances_invoked_label,
+             claim_map.first_resolution_label,
+             claim_map.second_resolution_label
            ) do
       claim_map =
         claim_map
@@ -235,24 +239,24 @@ defmodule QuickcourtBackendWeb.CourtResolver do
           code: cr.agreement_type
         })
         |> Map.put(:agreement_type_issue, %{
-          label: cr.agreement_type_issue,
-          code: claim_map.agreement_type_issue_code
+          label: claim_map.agreement_type_issue_label,
+          code: cr.agreement_type_issue
         })
         |> Map.put(:circumstances_invoked, %{
-          label: cr.circumstances_invoked,
-          code: claim_map.circumstances_invoked_code
+          label: claim_map.circumstances_invoked_label,
+          code: cr.circumstances_invoked
         })
         |> Map.put(:first_resolution, %{
-          label: cr.first_resolution,
-          code: claim_map.first_resolution_code
+          label: claim_map.first_resolution_label,
+          code: cr.first_resolution
         })
 
       claim_map =
-        case claim_map.second_resolution_code != nil do
+        case claim_map.second_resolution_label != nil do
           true ->
             Map.put(claim_map, :second_resolution, %{
-              label: cr.second_resolution,
-              code: claim_map.second_resolution_code
+              label: claim_map.second_resolution_label,
+              code: cr.second_resolution
             })
 
           _ ->
@@ -298,9 +302,22 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   end
 
   defp merge_warning_letter_if_necessary(claim_map, queried_fields) do
+    IO.inspect(queried_fields)
+
     case(Enum.member?(queried_fields, "pdfBase64WarningLetter")) do
       true ->
-        merge_warning_letter(claim_map)
+        with {:ok, claim_map} = merge_warning_letter(claim_map) do
+          claim_map =
+            Map.replace!(
+              claim_map,
+              :pdf_base64_warning_letter,
+              Base.encode64(claim_map.pdf_base64_warning_letter)
+            )
+
+          {:ok, claim_map}
+        else
+          e -> e
+        end
 
       _ ->
         {:ok, claim_map}
@@ -309,7 +326,7 @@ defmodule QuickcourtBackendWeb.CourtResolver do
 
   defp merge_warning_letter(claim_map) do
     with {:ok, warning_letter_pdf} <- ClaimPdfGenerator.generate_warning_letter_pdf(claim_map) do
-      {:ok, Map.merge(claim_map, %{pdf_base64_warning_letter: Base.encode64(warning_letter_pdf)})}
+      {:ok, Map.merge(claim_map, %{pdf_base64_warning_letter: warning_letter_pdf})}
     else
       e -> {:error, "There was an error generating warning letter. " <> IO.inspect(e)}
     end

@@ -29,11 +29,11 @@ defmodule QuickcourtBackend.Court.Claim do
 
     # Claim part
     field :case_number, :string
-    field :agreement_type_code, :string
-    field :agreement_type_issue_code, :string
-    field :circumstances_invoked_code, :string
-    field :first_resolution_code, :string
-    field :second_resolution_code, :string
+    field :agreement_type_label, :string
+    field :agreement_type_issue_label, :string
+    field :circumstances_invoked_label, :string
+    field :first_resolution_label, :string
+    field :second_resolution_label, :string
     belongs_to :purchase_country, Country
     field :purchase_date, :utc_datetime
     belongs_to :delivery_country, Country
@@ -94,11 +94,11 @@ defmodule QuickcourtBackend.Court.Claim do
       :goods_return_date,
       :claimant_country_id,
       :defendant_country_id,
-      :agreement_type_code,
-      :agreement_type_issue_code,
-      :circumstances_invoked_code,
-      :first_resolution_code,
-      :second_resolution_code,
+      :agreement_type_label,
+      :agreement_type_issue_label,
+      :circumstances_invoked_label,
+      :first_resolution_label,
+      :second_resolution_label,
       :issue_description,
       :type_of_service_or_goods,
       :damages_description,
@@ -133,10 +133,10 @@ defmodule QuickcourtBackend.Court.Claim do
       :contract_cancellation_date,
       :claimant_country_id,
       :defendant_country_id,
-      :agreement_type_code,
-      :agreement_type_issue_code,
-      :circumstances_invoked_code,
-      :first_resolution_code,
+      :agreement_type_label,
+      :agreement_type_issue_label,
+      :circumstances_invoked_label,
+      :first_resolution_label,
       :issue_description,
       :type_of_service_or_goods,
       :damages_description,
@@ -179,45 +179,34 @@ defmodule QuickcourtBackend.Court.Claim do
   defp fields_not_equal(changeset, _, _, _, _), do: changeset
 
   defp validate_and_translate_claim_rule(changeset) do
-    agreement_type_code = get_field(changeset, :agreement_type_code)
-    agreement_type_issue_code = get_field(changeset, :agreement_type_issue_code)
-    circumstances_invoked_code = get_field(changeset, :circumstances_invoked_code)
-    first_resolution_code = get_field(changeset, :first_resolution_code)
-    second_resolution_code = get_field(changeset, :second_resolution_code, nil)
+    agreement_type_label = get_field(changeset, :agreement_type_label)
+    agreement_type_issue_label = get_field(changeset, :agreement_type_issue_label)
+    circumstances_invoked_label = get_field(changeset, :circumstances_invoked_label)
+    first_resolution_label = get_field(changeset, :first_resolution_label)
+    second_resolution_label = get_field(changeset, :second_resolution_label, nil)
 
-    case QuickcourtBackend.Court.get_claim_rules_by_codes(
-           agreement_type_code,
-           agreement_type_issue_code,
-           circumstances_invoked_code,
-           first_resolution_code,
-           second_resolution_code
+    case QuickcourtBackend.Court.get_claim_rules_by_labels(
+           agreement_type_label,
+           agreement_type_issue_label,
+           circumstances_invoked_label,
+           first_resolution_label,
+           second_resolution_label
          ) do
       [_ | []] ->
         changeset
 
-      # |> put_change(:agreement_type, String.slice(cr.agreement_type, 3..-1))
-      # |> put_change(:agreement_type_issue, cr.agreement_type_issue)
-      # |> put_change(:circumstances_invoked, cr.circumstances_invoked)
-      # |> put_change(:first_resolution, cr.first_resolution)
-      # |> put_change(:second_resolution, cr.second_resolution)
-      # |> delete_change(:agreement_type_code)
-      # |> delete_change(:agreement_type_issue_code)
-      # |> delete_change(:circumstances_invoked_code)
-      # |> delete_change(:first_resolution_code)
-      # |> delete_change(:second_resolution_code)
-
       [] ->
         add_error(
           changeset,
-          :agreement_type_code,
-          "Combination of agreement_type_code, agreement_type_issue_code, circumstances_invoked_code, first_resolution_code, second_resolution_code is invalid"
+          :agreement_type_label,
+          "Combination of agreement_type_label, agreement_type_issue_label, circumstances_invoked_label, first_resolution_label, second_resolution_label is invalid"
         )
 
       [_ | _] ->
         add_error(
           changeset,
-          :second_resolution_code,
-          "Combination of agreement_type_code, agreement_type_issue_code, circumstances_invoked_code, first_resolution_code, second_resolution_code is ambigious, probably you are missing second_resolution_code"
+          :second_resolution_label,
+          "Combination of agreement_type_label, agreement_type_issue_label, circumstances_invoked_label, first_resolution_label, second_resolution_label is ambigious, probably you are missing second_resolution_label"
         )
     end
   end
