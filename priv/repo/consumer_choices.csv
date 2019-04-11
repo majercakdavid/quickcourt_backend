@@ -1,4 +1,4 @@
-agreement_type,agreement_type_issue,cicumstance_invoked_code,circumstance_invoked,first_resolution_code,first_resolution,second_resolution_code,second_resolution
+agreement_type,agreement_type_issue,circumstances_invoked_code,circumstances_invoked,first_resolution_code,first_resolution,second_resolution_code,second_resolution
 01 Sales contract,Cancellation,6_02_30_non_payment_reimbursement_price_of_good,Non reimbursement - price of good,7_1_cancellation,I want to get a refund of difference,,
 01 Sales contract,Cancellation,6_02_30_non_payment_reimbursment_shipping_charges,Non reimbursement - shipping charges,7_1_cancellation,I want to get a refund of difference,,
 01 Sales contract,Cancellation,6_02_30_non_payment_reimbursment_shipping_charges_price_good,Non reimbursement - shipping charges and price of good,7_1_cancellation,I want to get a refund of difference,,

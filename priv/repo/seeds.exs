@@ -15,12 +15,14 @@ alias QuickcourtBackend.Shared.Country
 alias QuickcourtBackend.Court.ClaimStatus
 alias QuickcourtBackend.Repo
 
-File.stream!("./priv/repo/consumer_choices.csv")
+File.stream!("./priv/repo/consumer_claim_rules.csv")
 |> Stream.drop(1)
 |> CSV.decode(
   headers: [
     :agreement_type,
     :agreement_type_issue,
+    :claimant_description,
+    :defendant_description,
     :circumstances_invoked_code,
     :circumstances_invoked,
     :first_resolution_code,
