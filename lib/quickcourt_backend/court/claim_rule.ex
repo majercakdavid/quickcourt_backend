@@ -5,6 +5,8 @@ defmodule QuickcourtBackend.Court.ClaimRule do
   schema "claim_rules" do
     field :agreement_type, :string
     field :agreement_type_issue, :string
+    field :claimant_description, :string
+    field :defendant_description, :string
     field :circumstances_invoked, :string
     field :circumstances_invoked_code, :string
     field :first_resolution, :string
@@ -21,6 +23,8 @@ defmodule QuickcourtBackend.Court.ClaimRule do
     |> cast(attrs, [
       :agreement_type,
       :agreement_type_issue,
+      :claimant_description,
+      :defendant_description,
       :circumstances_invoked_code,
       :circumstances_invoked,
       :first_resolution_code,

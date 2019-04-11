@@ -114,6 +114,18 @@ defmodule QuickcourtBackendWeb.Schema do
       resolve(&CourtResolver.all_agreement_type_issues/3)
     end
 
+    field :claimant_description, :string do
+      arg(:agreement_type_code, non_null(:string))
+      arg(:agreement_type_issue_code, non_null(:string))
+      resolve(&CourtResolver.get_claimant_description/3)
+    end
+
+    field :defendant_description, :string do
+      arg(:agreement_type_code, non_null(:string))
+      arg(:agreement_type_issue_code, non_null(:string))
+      resolve(&CourtResolver.get_defendant_description/3)
+    end
+
     field :circumstances_invoked, non_null(list_of(non_null(:claim_rule))) do
       arg(:agreement_type_code, non_null(:string))
       arg(:agreement_type_issue_code, non_null(:string))

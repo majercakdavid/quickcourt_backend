@@ -259,6 +259,38 @@ defmodule QuickcourtBackend.Court do
     end)
   end
 
+  def get_claimant_description(agreement_type_code, agreement_type_issue_code) do
+    Repo.one(
+      from cr in "claim_rules",
+        where:
+          cr.agreement_type == ^agreement_type_code and
+            cr.agreement_type_issue == ^agreement_type_issue_code,
+        select: %{
+          agreement_type: cr.agreement_type,
+          agreement_type_issue: cr.agreement_type_issue,
+          claimant_description: cr.claimant_description
+        },
+        limit: 1
+    )
+    |> Map.get(:defendant_description)
+  end
+
+  def get_defendant_description(agreement_type_code, agreement_type_issue_code) do
+    Repo.one(
+      from cr in "claim_rules",
+        where:
+          cr.agreement_type == ^agreement_type_code and
+            cr.agreement_type_issue == ^agreement_type_issue_code,
+        select: %{
+          agreement_type: cr.agreement_type,
+          agreement_type_issue: cr.agreement_type_issue,
+          defendant_description: cr.defendant_description
+        },
+        limit: 1
+    )
+    |> Map.get(:defendant_description)
+  end
+
   @doc """
   Returns the list of possible circumstances invoked according
   to passed in agreement type and agreement type issue.

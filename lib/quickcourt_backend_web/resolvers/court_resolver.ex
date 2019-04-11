@@ -86,8 +86,6 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   def get_claim(_root, %{id: claim_id}, info = %{context: %{current_user: user}}) do
     queried_fields = Absinthe.Resolution.project(info) |> Enum.map(& &1.name)
 
-    IO.inspect queried_fields
-
     claim = Court.get_claim!(claim_id)
 
     with true <- claim_belongs_to_user?(claim, user),
@@ -116,6 +114,34 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   def all_agreement_type_issues(_root, %{agreement_type_code: agreement_type_code}, _info) do
     agreement_type_issues = Court.list_agreement_type_issues(agreement_type_code)
     {:ok, agreement_type_issues}
+  end
+
+  def get_claimant_description(
+        _root,
+        %{
+          agreement_type_code: agreement_type_code,
+          agreement_type_issue_code: agreement_type_issue_code
+        },
+        _info
+      ) do
+    claimant_description =
+      Court.get_claimant_description(agreement_type_code, agreement_type_issue_code)
+
+    {:ok, claimant_description}
+  end
+
+  def get_defendant_description(
+        _root,
+        %{
+          agreement_type_code: agreement_type_code,
+          agreement_type_issue_code: agreement_type_issue_code
+        },
+        _info
+      ) do
+    defendant_description =
+      Court.get_defendant_description(agreement_type_code, agreement_type_issue_code)
+
+    {:ok, defendant_description}
   end
 
   def all_circumstances_invoked(
