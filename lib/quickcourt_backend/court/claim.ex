@@ -48,8 +48,8 @@ defmodule QuickcourtBackend.Court.Claim do
     field :damages_description, :string
     field :species_damages_description, :string
 
-    field :claim_for_money, :boolean, default: false
-    field :amount, :float, default: nil
+    field :first_resolution_amount, :float, default: nil
+    field :second_resolution_amount, :float, default: nil
     field :currency, :string, default: nil
 
     # Claim stages
@@ -103,8 +103,8 @@ defmodule QuickcourtBackend.Court.Claim do
       :type_of_service_or_goods,
       :damages_description,
       :species_damages_description,
-      :claim_for_money,
-      :amount,
+      :first_resolution_amount,
+      :second_resolution_amount,
       :currency,
       :claim_status_id,
       :warning_expiration_email_sent_on,
@@ -140,8 +140,6 @@ defmodule QuickcourtBackend.Court.Claim do
       :issue_description,
       :type_of_service_or_goods,
       :damages_description,
-      :claim_for_money,
-      :amount,
       :currency,
       :claim_status_id,
       :user_id

@@ -85,7 +85,7 @@ E-mail:<%= claimant_email %><br />
 <td width="10%">&nbsp;</td>
 <td width="45%" style="">
 <%= defendant_company_name %><br />
-<< defendant_name >> << defendant_surname >><br />
+<!-- << defendant_name >> << defendant_surname >><br /> -->
 <%= defendant_address %><br />
 <%= defendant_zip %><br />
 <%= defendant_city %><br />
@@ -93,18 +93,18 @@ E-mail:<%= claimant_email %><br />
 Tel.no:<%= defendant_phone %><br />
 E-mail:<%= defendant_email %><br />
 <br />
-<< date >>
+<%= inserted_at %>
 </td>
 </tr></table>
 
 <br />
-<u>Concerning : <%= agreement_type %>. <%= agreement_type_issue %></u>
+<u>Concerning: <%= agreement_type %>. <%= agreement_type_issue %></u>
 
 <br /><br />
 
 In <%= purchase_country %> on <%= purchase_date %> , claimant has entered a
 <%= agreement_type %> (see evidence I), with defendant for
-<== TODO: inputtypesvcgood ==>.
+<%= type_of_service_or_goods %>.
 <br />
 <br />	
 Delivery took place in <%= delivery_country %> on <%= delivery_date %> .
@@ -112,22 +112,28 @@ Delivery took place in <%= delivery_country %> on <%= delivery_date %> .
 On <%= lack_discovery_date %> claimant discovered the following lack :
 <%= circumstances_invoked %> .
 <br />
-<<  invoked_circumstances_addnl  >>
+<%= issue_description %>
 <br />
 <br />
 Based on this claimant wants to : <%= first_resolution %>
+<%= if first_resolution_amount != "" do %>
 <br />
-Value / amount : << firstchoice_amount >> <%= currency %>
-<br>
+Value / amount : <%= first_resolution_amount %> <%= currency %>
+<% end %>
+<%= if second_resolution != "" do %>
+<br />
 Subsidiairly claimant wants to : <%= second_resolution %>
+<%= if second_resolution_amount != "" do %>
 <br />
 <!-- TODO: CAN CURRENCIES BE DIFFERENT??? -->
-Value / amount : << secondchoice_amount >> <%= currency %>
+Value / amount : <%= second_resolution_amount %> <%= currency %>
+<% end %>
 <br />
+<% end %>
 <br />
 <!-- TODO: WHAT COUNTRY??? -->
 If defendant does not comply within 14 days seller is entitled to start court proceedings
-against seller in << country >> .
+against seller in <%= claimant_country %> .
 <br />
 <br />
 <br />

@@ -39,8 +39,8 @@ defmodule QuickcourtBackend.Repo.Migrations.CreateClaims do
       add :damages_description, :text
       add :species_damages_description, :text
 
-      add :claim_for_money, :boolean, default: false
-      add :amount, :float, default: nil
+      add :first_resolution_amount, :float, default: nil
+      add :second_resolution_amount, :float, default: nil
       add :currency, :string, default: nil
 
       add :claim_status_id, references(:claim_statuses)
