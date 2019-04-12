@@ -79,16 +79,22 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
 
     claim
     |> Enum.filter(fn {k, _} ->
-      !Enum.member?(["__meta__", "inserted_at", "updated_at", "user"], Atom.to_string(k))
+      !Enum.member?(["__meta__", "updated_at", "user"], Atom.to_string(k))
     end)
     |> Enum.map(fn {k, v} ->
       new_value =
         case v do
-          %DateTime{} -> to_string(v)
+          %DateTime{} -> to_string(DateTime.to_date(v))
+          %NaiveDateTime{} -> to_string(NaiveDateTime.to_date(v))
           %{name: name} -> name
           %{label: label} -> label
           nil -> ""
-          val -> to_string(val)
+          val -> 
+            if is_float(val) do
+              :erlang.float_to_binary(val, [{:decimals, 2}])
+            else
+              to_string(val)
+            end
         end
 
       {k, new_value}

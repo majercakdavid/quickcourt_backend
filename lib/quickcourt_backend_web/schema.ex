@@ -63,8 +63,8 @@ defmodule QuickcourtBackendWeb.Schema do
     field(:damages_description, non_null(:string))
     field(:species_damages_description, :string)
 
-    field :claim_for_money, non_null(:boolean)
-    field :amount, non_null(:float)
+    field :first_resolution_amount, :float
+    field :second_resolution_amount, :float
     field :currency, non_null(:string)
 
     field :claim_status, non_null(:enumeration)
@@ -209,8 +209,8 @@ defmodule QuickcourtBackendWeb.Schema do
       arg(:damages_description, non_null(:string))
       arg(:species_damages_description, :string)
 
-      arg(:claim_for_money, non_null(:boolean))
-      arg(:amount, non_null(:float))
+      arg(:first_resolution_amount, :float)
+      arg(:second_resolution_amount, :float)
       arg(:currency, non_null(:string))
 
       resolve(&CourtResolver.create_claim/3)
