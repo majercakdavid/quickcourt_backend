@@ -2,6 +2,7 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   alias QuickcourtBackend.Court
   alias QuickcourtBackend.ClaimPdfGenerator
   alias QuickcourtBackend.Email
+  alias QuickcourtBackendWeb.Helpers.ChangesetErrorHelper
 
   @type user_context() :: %{current_user: Auth.User}
 
@@ -26,7 +27,11 @@ defmodule QuickcourtBackendWeb.CourtResolver do
          {:ok, claim_map} <- merge_epo_a_if_necessary(claim_map, queried_fields) do
       {:ok, claim_map}
     else
-      {:error, info} -> {:error, info}
+      {:error, changeset = %Ecto.Changeset{}} ->
+        {:error, ChangesetErrorHelper.handle_changeset_errors(changeset)}
+
+      {:error, info} ->
+        {:error, info}
     end
   end
 
@@ -65,8 +70,8 @@ defmodule QuickcourtBackendWeb.CourtResolver do
           {:error, e} -> {:error, e}
         end
 
-      {:error, errors} ->
-        {:error, "Errors:" <> inspect(errors)}
+      {:error, changeset} ->
+        {:error, ChangesetErrorHelper.handle_changeset_errors(changeset)}
     end
   end
 
@@ -281,7 +286,7 @@ defmodule QuickcourtBackendWeb.CourtResolver do
              pdf_base64_small_claim_form: Base.encode64(small_claim_form_pdf)
            })}
         else
-          e -> {:error, "There was an error generating small claim form. " <> IO.inspect(e)}
+          e -> {:error, "There was an error generating small claim form: " <> inspect(e)}
         end
 
       _ ->
@@ -295,7 +300,7 @@ defmodule QuickcourtBackendWeb.CourtResolver do
         with {:ok, epo_a_pdf} <- ClaimPdfGenerator.generate_epo_a_pdf(claim_map) do
           {:ok, Map.merge(claim_map, %{pdf_base64_epo_a: Base.encode64(epo_a_pdf)})}
         else
-          e -> {:error, "There was an error generating small claim form. " <> IO.inspect(e)}
+          e -> {:error, "There was an error generating small claim form. " <> inspect(e)}
         end
 
       _ ->
@@ -304,8 +309,6 @@ defmodule QuickcourtBackendWeb.CourtResolver do
   end
 
   defp merge_warning_letter_if_necessary(claim_map, queried_fields) do
-    IO.inspect(queried_fields)
-
     case(Enum.member?(queried_fields, "pdfBase64WarningLetter")) do
       true ->
         with {:ok, claim_map} <- merge_warning_letter(claim_map) do
@@ -330,7 +333,7 @@ defmodule QuickcourtBackendWeb.CourtResolver do
     with {:ok, warning_letter_pdf} <- ClaimPdfGenerator.generate_warning_letter_pdf(claim_map) do
       {:ok, Map.merge(claim_map, %{pdf_base64_warning_letter: warning_letter_pdf})}
     else
-      e -> {:error, "There was an error generating warning letter. " <> IO.inspect(e)}
+      e -> {:error, "There was an error generating warning letter. " <> inspect(e)}
     end
   end
 end

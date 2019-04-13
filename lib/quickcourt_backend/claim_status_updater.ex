@@ -22,7 +22,7 @@ defmodule QuickcourtBackend.ClaimStatusUpdater do
 
     Enum.each(expired_claims, fn claim ->
       Email.send_update_status_email(claim.claimant_email, claim.case_number)
-      # Court.update_claim(claim, %{warning_expiration_email_sent_on: DateTime.utc_now()})
+      Court.update_claim(claim, %{warning_expiration_email_sent_on: DateTime.utc_now()})
     end)
   end
 end

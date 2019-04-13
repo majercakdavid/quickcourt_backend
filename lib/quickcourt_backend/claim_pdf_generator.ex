@@ -20,9 +20,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
       File.read(filename)
     rescue
       e ->
-        IO.puts("ERROR GENERATING PDF")
-        IO.inspect(e)
-        throw(e)
+        {:error, e}
     end
   end
 
@@ -42,9 +40,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
       File.read(filename)
     rescue
       e ->
-        IO.puts("ERROR GENERATING PDF")
-        IO.inspect(e)
-        throw(e)
+        {:error, e}
     end
   end
 
@@ -64,9 +60,7 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
       File.read(filename)
     rescue
       e ->
-        IO.puts("ERROR GENERATING PDF")
-        IO.inspect(e)
-        throw(e)
+        {:error, e}
     end
   end
 
@@ -84,12 +78,22 @@ defmodule QuickcourtBackend.ClaimPdfGenerator do
     |> Enum.map(fn {k, v} ->
       new_value =
         case v do
-          %DateTime{} -> to_string(DateTime.to_date(v))
-          %NaiveDateTime{} -> to_string(NaiveDateTime.to_date(v))
-          %{name: name} -> name
-          %{label: label} -> label
-          nil -> ""
-          val -> 
+          %DateTime{} ->
+            to_string(DateTime.to_date(v))
+
+          %NaiveDateTime{} ->
+            to_string(NaiveDateTime.to_date(v))
+
+          %{name: name} ->
+            name
+
+          %{label: label} ->
+            label
+
+          nil ->
+            ""
+
+          val ->
             if is_float(val) do
               :erlang.float_to_binary(val, [{:decimals, 2}])
             else

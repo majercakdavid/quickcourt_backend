@@ -110,6 +110,8 @@ defmodule QuickcourtBackend.Auth do
     with {:ok, user} <- authenticate_user(args),
          {:ok, jwt_token, _} <- Guardian.encode_and_sign(user) do
       {:ok, %{token: jwt_token, user: user}}
+    else
+      e -> e
     end
   end
 
