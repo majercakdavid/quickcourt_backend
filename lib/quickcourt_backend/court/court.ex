@@ -107,7 +107,7 @@ defmodule QuickcourtBackend.Court do
         {:ok, claim}
 
       {:error, changeset} ->
-        {:error, Map.get(changeset, :errors)}
+        {:error, changeset}
     end
   end
 
@@ -141,7 +141,7 @@ defmodule QuickcourtBackend.Court do
       {:ok, claim}
     else
       {:error, changeset} ->
-        {:error, Map.get(changeset, :errors)}
+        {:error, changeset}
     end
   end
 

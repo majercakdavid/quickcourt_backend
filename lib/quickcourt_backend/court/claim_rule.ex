@@ -32,16 +32,5 @@ defmodule QuickcourtBackend.Court.ClaimRule do
       :second_resolution_code,
       :second_resolution
     ])
-
-    # |> validate_required([
-    #   :agreement_type,
-    #   :agreement_type_issue,
-    #   :circumstances_invoked_code,
-    #   :circumstances_invoked,
-    #   :first_resolution_code,
-    #   :first_resolution,
-    #   :second_resolution_code,
-    #   :second_resolution
-    # ])
   end
 end

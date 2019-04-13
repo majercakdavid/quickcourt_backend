@@ -144,19 +144,64 @@ defmodule QuickcourtBackend.Court.Claim do
       :claim_status_id,
       :user_id
     ])
-    |> fields_not_equal(:claimant_country_id, :defendant_country_id)
+    # Basic string validations
+
+    ## CLAIMANT
+    |> validate_length(:claimant_name, min: 3)
+    |> validate_length(:claimant_surname, min: 3)
+    |> validate_length(:claimant_city, min: 3)
+    |> validate_length(:claimant_zip, min: 3)
+    |> validate_length(:claimant_address, min: 4)
+    |> validate_length(:claimant_email, min: 3)
     |> validate_format(:claimant_email, ~r/@/)
     |> update_change(:claimant_email, &String.downcase(&1))
+    |> validate_length(:claimant_phone, min: 8, max: 13)
+
+    ## DEFENDANT
+    |> validate_length(:defendant_company_name, min: 3)
+    |> validate_length(:defendant_city, min: 3)
+    |> validate_length(:defendant_zip, min: 3)
+    |> validate_length(:defendant_address, min: 4)
+    |> validate_length(:defendant_email, min: 3)
     |> validate_format(:defendant_email, ~r/@/)
     |> update_change(:defendant_email, &String.downcase(&1))
-    |> validate_and_translate_claim_rule()
+    |> validate_length(:defendant_phone, min: 8, max: 13)
+
+    ## CLAIM FIELDS
+    |> validate_length(:issue_description, min: 5)
+    |> validate_length(:type_of_service_or_goods, min: 3)
+
+    ## BUSINESS LOGIC
+
+    # conditional validations according to the user input (sales contract)
+    |> validate_conditional_required()
+    |> validate_conditional_rules()
+
+    # validates agreement_type_type, agreement_type_issue, circumstances_invoked
+    # first_resolution and second_resolution (whether it is presented in db as rule)
+    |> validate_claim_rule()
+
+    # as we are focusing on european claims we do not want to
+    # bother with claims within one country
+    |> fields_not_equal(:claimant_country_id, :defendant_country_id)
+
+    # DATES
+    |> validate_date_against_today(:purchase_date, :lt)
+    |> validate_date_against_today(:delivery_date, :lt)
+    |> validate_date_against_today(:lack_discovery_date, :lt)
+    |> validate_date_against_today(:contract_cancellation_date, :lt)
+    |> validate_date_against_today(:goods_return_date, :lt)
+
+    # CURRENCY
+    |> validate_currency_code(:currency)
+
+    ## FOREIGN KEYS
     |> foreign_key_constraint(:claimant_country_id)
     |> foreign_key_constraint(:defendant_country_id)
     |> foreign_key_constraint(:purchase_country_id)
     |> foreign_key_constraint(:delivery_country_id)
     |> foreign_key_constraint(:claim_status_id)
     |> foreign_key_constraint(:user_id)
-    |> validate_required([:is_business])
   end
 
   defp fields_not_equal(changeset, field1, field2) do
@@ -170,13 +215,171 @@ defmodule QuickcourtBackend.Court.Claim do
     add_error(
       changeset,
       field1,
-      Atom.to_string(field1) <> " cannot be equal to " <> Atom.to_string(field2)
+      "cannot be equal to " <> Atom.to_string(field2)
     )
   end
 
   defp fields_not_equal(changeset, _, _, _, _), do: changeset
 
-  defp validate_and_translate_claim_rule(changeset) do
+  def validate_date_against_today(changeset, field, opts \\ []) do
+    if date_val = get_field(changeset, field) do
+      do_validate_date_against_today(changeset, field, date_val, opts)
+    else
+      changeset
+    end
+  end
+
+  defp do_validate_date_against_today(changeset, field, date, opts) do
+    today = Date.utc_today()
+
+    changeset =
+      if opts == :lt and Date.compare(date, today) != :lt do
+        changeset
+        |> add_error(field, "cannot be future date")
+      else
+        changeset
+      end
+
+    changeset =
+      if opts == :gt and Date.compare(date, today) != :gt do
+        changeset
+        |> add_error(field, "cannot be past date")
+      else
+        changeset
+      end
+
+    changeset
+  end
+
+  defp validate_dates_days_difference(changeset, begin_date_field, end_date_field, max_days_count) do
+    IO.inspect(begin_date_field)
+    IO.inspect(end_date_field)
+
+    if begin_date_val = get_field(changeset, begin_date_field) do
+      if end_date_val = get_field(changeset, end_date_field) do
+        diff = Date.diff(end_date_val, begin_date_val)
+
+        IO.inspect(diff)
+
+        do_validate_dates_days_difference(
+          changeset,
+          begin_date_field,
+          end_date_field,
+          diff,
+          max_days_count
+        )
+      else
+        changeset
+      end
+    else
+      changeset
+    end
+  end
+
+  defp do_validate_dates_days_difference(changeset, begin_date_field, end_date_field, diff, _)
+       when diff < 0 do
+    changeset
+    |> add_error(begin_date_field, "Must be smaller than " <> Atom.to_string(end_date_field))
+  end
+
+  defp do_validate_dates_days_difference(
+         changeset,
+         begin_date_field,
+         end_date_field,
+         diff,
+         max_days_count
+       )
+       when diff > max_days_count do
+    changeset
+    |> add_error(
+      begin_date_field,
+      "can differ at maximum by " <>
+        inspect(max_days_count) <> " days from " <> Atom.to_string(end_date_field)
+    )
+  end
+
+  defp do_validate_dates_days_difference(changeset, _, _, _, _), do: changeset
+
+  defp validate_currency_code(changeset, field) do
+    eu_currency_codes = [
+      "BGN",
+      "CYP",
+      "DKK",
+      "EEK",
+      "EUR",
+      "GBP",
+      "HUF",
+      "LTL",
+      "LVL",
+      "MTL",
+      "PLN",
+      "RON",
+      "SEK"
+    ]
+
+    if field_val = get_field(changeset, field) do
+      case Enum.member?(eu_currency_codes, field_val) do
+        true ->
+          changeset
+
+        _ ->
+          changeset
+          |> add_error(
+            field,
+            "allows only for the following currency codes: " <>
+              Enum.join(eu_currency_codes, ", ")
+          )
+      end
+    else
+      changeset
+    end
+  end
+
+  defp validate_conditional_rules(changeset) do
+    # for claims for goods and agreement_type_issue == Cancellation
+    agreement_type = get_field(changeset, :agreement_type_label)
+    agreement_type_issue = get_field(changeset, :agreement_type_issue_label)
+
+    changeset =
+      case agreement_type == "01 Sales contract" and agreement_type_issue == "Cancellation" do
+        true ->
+          changeset
+          # according to the law a buyer can cancel an order at most 14 days after he bought an item
+          # this item must be sent at most 14 days after the order was cancelled
+          |> validate_dates_days_difference(:delivery_date, :contract_cancellation_date, 14)
+          |> validate_dates_days_difference(:contract_cancellation_date, :goods_return_date, 14)
+
+        _ ->
+          changeset
+      end
+
+    # TODO: ASK HOW IS IT WITH THE SERVICES AND OTHER TYPES OF AGREEMENT TYPES BESIDES SALES
+    changeset =
+      case String.downcase(agreement_type) =~ "service" and agreement_type_issue == "Cancellation" do
+        true ->
+          changeset
+          # according to the law a buyer can cancel an order at 2 months after it was executed
+          |> validate_dates_days_difference(:delivery_date, :contract_cancellation_date, 60)
+
+        _ ->
+          changeset
+      end
+  end
+
+  defp validate_conditional_required(changeset) do
+    # for claims for goods and agreement_type_issue == Cancellation
+    agreement_type = get_field(changeset, :agreement_type_label)
+    agreement_type_issue = get_field(changeset, :agreement_type_issue_label)
+
+    if agreement_type == "01 Sales contract" and agreement_type_issue == "Cancellation" do
+      changeset
+      |> validate_required(:goods_return_date)
+    else
+      changeset
+    end
+  end
+
+  defp validate_claim_rule(changeset) do
     agreement_type_label = get_field(changeset, :agreement_type_label)
     agreement_type_issue_label = get_field(changeset, :agreement_type_issue_label)
     circumstances_invoked_label = get_field(changeset, :circumstances_invoked_label)

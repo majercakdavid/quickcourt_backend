@@ -1,5 +1,6 @@
 defmodule QuickcourtBackendWeb.UserResolver do
   alias QuickcourtBackend.Auth
+  alias QuickcourtBackendWeb.Helpers.ChangesetErrorHelper
 
   @type user_context() :: %{current_user: Auth.User}
 
@@ -18,8 +19,8 @@ defmodule QuickcourtBackendWeb.UserResolver do
       {:ok, _} ->
         perform_login(%{email: input.email, password: input.password})
 
-      {:error, %{errors: errors}} ->
-        {:error, normalize_errors(errors)}
+      {:error, changeset} ->
+        {:error, ChangesetErrorHelper.handle_changeset_errors(changeset)}
 
       {:error, message} ->
         {:error, [message]}

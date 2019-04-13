@@ -1,43 +1,59 @@
 <html>
+
 <head>
-<style>
-body {font-family: sans-serif;
-	font-size: 10pt;
-}
-p {	margin: 0pt; }
-table.items {
-	border: 0.1mm solid #000000;
-}
-td { vertical-align: top; }
-.items td {
-	border-left: 0.1mm solid #000000;
-	border-right: 0.1mm solid #000000;
-}
-table thead td { background-color: #EEEEEE;
-	text-align: center;
-	border: 0.1mm solid #000000;
-	font-variant: small-caps;
-}
-.items td.blanktotal {
-	background-color: #EEEEEE;
-	border: 0.1mm solid #000000;
-	background-color: #FFFFFF;
-	border: 0mm none #000000;
-	border-top: 0.1mm solid #000000;
-	border-right: 0.1mm solid #000000;
-}
-.items td.totals {
-	text-align: right;
-	border: 0.1mm solid #000000;
-}
-.items td.cost {
-	text-align: "." center;
-}
-</style>
+	<style>
+		body {
+			font-family: sans-serif;
+			font-size: 10pt;
+		}
+
+		p {
+			margin: 0pt;
+		}
+
+		table.items {
+			border: 0.1mm solid #000000;
+		}
+
+		td {
+			vertical-align: top;
+		}
+
+		.items td {
+			border-left: 0.1mm solid #000000;
+			border-right: 0.1mm solid #000000;
+		}
+
+		table thead td {
+			background-color: #EEEEEE;
+			text-align: center;
+			border: 0.1mm solid #000000;
+			font-variant: small-caps;
+		}
+
+		.items td.blanktotal {
+			background-color: #EEEEEE;
+			border: 0.1mm solid #000000;
+			background-color: #FFFFFF;
+			border: 0mm none #000000;
+			border-top: 0.1mm solid #000000;
+			border-right: 0.1mm solid #000000;
+		}
+
+		.items td.totals {
+			text-align: right;
+			border: 0.1mm solid #000000;
+		}
+
+		.items td.cost {
+			text-align: "."center;
+		}
+	</style>
 </head>
+
 <body>
 
-<!--mpdf
+	<!--mpdf
 <htmlpageheader name="myheader">
 <table width="100%"><tr>
 <td width="50%" style="color:#0000BB; "><span style="font-weight: bold; font-size: 14pt;"></span><br /><img src="Penguins.jpg" width="10%">
@@ -59,88 +75,89 @@ Page {PAGENO} of {nb}
 <sethtmlpagefooter name="myfooter" value="on" />
 mpdf-->
 
-<div style="text-align: right">Date2: 13th November 2008</div>
+	<div style="float: right">
+		<img src="data:image/png;base64,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"
+			style="height:120px;width:auto;padding: 10px">
+	</div>
 
-<table width="100%" style="font-family: serif;" cellpadding="10">
-<tr>
-<td width="45%" style=" ">
-<%= claimant_surname %><br />
-<%= claimant_name %><br />
-<%= claimant_address %><br />
-<%= claimant_zip %><br />
-<%= claimant_city %><br />
-<%= claimant_country %><br />
-Tel.no:<%= claimant_phone %><br />
-E-mail:<%= claimant_email %><br />
+	<table width="45%" style="font-family: serif;" cellpadding="10">
+		<tr>
+			<td width="100%">
+				<%= claimant_name %> <%= claimant_surname %><br />
+				<%= claimant_address %><br />
+				<%= claimant_zip %> <%= claimant_city %><br />
+				<%= claimant_country %><br />
+				Tel.no:<%= claimant_phone %><br />
+				E-mail:<%= claimant_email %><br />
+			</td>
+		</tr>
+	</table>
 
-</td>
-<td width="10%">&nbsp;</td>
-<td width="45%" style=""></td>
-</tr></table>
+	<table width="100%" style="font-family: serif;" cellpadding="10">
+		<tr>
+			<td width="45%" style="text-align: right">
+				<%= defendant_company_name %><br />
+				<!-- << defendant_name >> << defendant_surname >><br /> -->
+				<%= defendant_address %><br />
+				<%= defendant_zip %><br />
+				<%= defendant_city %><br />
+				<%= defendant_country %><br />
+				Tel.no:<%= defendant_phone %><br />
+				E-mail:<%= defendant_email %><br />
+				<br />
+				<%= inserted_at %>
+			</td>
+		</tr>
+	</table>
 
-<table width="100%" style="font-family: serif;" cellpadding="10">
-<tr>
-<td width="45%" style=" ">
-</td>
-<td width="10%">&nbsp;</td>
-<td width="45%" style="">
-<%= defendant_company_name %><br />
-<!-- << defendant_name >> << defendant_surname >><br /> -->
-<%= defendant_address %><br />
-<%= defendant_zip %><br />
-<%= defendant_city %><br />
-<%= defendant_country %><br />
-Tel.no:<%= defendant_phone %><br />
-E-mail:<%= defendant_email %><br />
-<br />
-<%= inserted_at %>
-</td>
-</tr></table>
+	<br />
+	<br />
 
-<br />
-<u>Concerning: <%= agreement_type %>. <%= agreement_type_issue %></u>
+	<br />
+	<u>Concerning: <%= agreement_type %>. <%= agreement_type_issue %></u>
 
-<br /><br />
+	<br /><br />
 
-In <%= purchase_country %> on <%= purchase_date %> , claimant has entered a
-<%= agreement_type %> (see evidence I), with defendant for
-<%= type_of_service_or_goods %>.
-<br />
-<br />	
-Delivery took place in <%= delivery_country %> on <%= delivery_date %> .
-<br />
-On <%= lack_discovery_date %> claimant discovered the following lack :
-<%= circumstances_invoked %> .
-<br />
-<%= issue_description %>
-<br />
-<br />
-Based on this claimant wants to : <%= first_resolution %>
-<%= if first_resolution_amount != "" do %>
-<br />
-Value / amount : <%= first_resolution_amount %> <%= currency %>
-<% end %>
-<%= if second_resolution != "" do %>
-<br />
-Subsidiairly claimant wants to : <%= second_resolution %>
-<%= if second_resolution_amount != "" do %>
-<br />
-<!-- TODO: CAN CURRENCIES BE DIFFERENT??? -->
-Value / amount : <%= second_resolution_amount %> <%= currency %>
-<% end %>
-<br />
-<% end %>
-<br />
-<!-- TODO: WHAT COUNTRY??? -->
-If defendant does not comply within 14 days seller is entitled to start court proceedings
-against seller in <%= claimant_country %> .
-<br />
-<br />
-<br />
-Best regards
-<br />
-<%= claimant_surname %> <%= claimant_name %>
+	In <%= purchase_country %> on <%= purchase_date %> , claimant has entered a
+	<%= agreement_type %> (see evidence I), with defendant for
+	<%= type_of_service_or_goods %>.
+	<br />
+	<br />
+	Delivery took place in <%= delivery_country %> on <%= delivery_date %> .
+	<br />
+	On <%= lack_discovery_date %> claimant discovered the following lack :
+	<%= circumstances_invoked %> .
+	<br />
+	<%= issue_description %>
+	<br />
+	<br />
+	Based on this claimant wants to : <%= first_resolution %>
+	<%= if first_resolution_amount != "" do %>
+	<br />
+	Value / amount : <%= first_resolution_amount %> <%= currency %>
+	<% end %>
+	<%= if second_resolution != "" do %>
+	<br />
+	Subsidiairly claimant wants to : <%= second_resolution %>
+	<%= if second_resolution_amount != "" do %>
+	<br />
+	<!-- TODO: CAN CURRENCIES BE DIFFERENT??? -->
+	Value / amount : <%= second_resolution_amount %> <%= currency %>
+	<% end %>
+	<br />
+	<% end %>
+	<br />
+	<!-- TODO: WHAT COUNTRY??? -->
+	If defendant does not comply within 14 days seller is entitled to start court proceedings
+	against seller in <%= claimant_country %> .
+	<br />
+	<br />
+	<br />
+	Best regards,
+	<br />
+	<%= claimant_surname %> <%= claimant_name %>
 
 
 </body>
+
 </html>
