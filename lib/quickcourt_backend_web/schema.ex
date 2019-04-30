@@ -55,7 +55,7 @@ defmodule QuickcourtBackendWeb.Schema do
     field :delivery_date, non_null(:datetime)
 
     field :lack_discovery_date, non_null(:datetime)
-    field :contract_cancellation_date, non_null(:datetime)
+    field :contract_cancellation_date, :datetime
     field :goods_return_date, :datetime
     field(:issue_description, non_null(:string))
     field(:type_of_service_or_goods, non_null(:string))
@@ -201,7 +201,7 @@ defmodule QuickcourtBackendWeb.Schema do
       arg(:delivery_date, non_null(:datetime))
 
       arg(:lack_discovery_date, non_null(:datetime))
-      arg(:contract_cancellation_date, non_null(:datetime))
+      arg(:contract_cancellation_date, :datetime)
       arg(:goods_return_date, :datetime)
 
       arg(:issue_description, non_null(:string))
