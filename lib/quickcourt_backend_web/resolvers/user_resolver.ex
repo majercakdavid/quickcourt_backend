@@ -19,7 +19,7 @@ defmodule QuickcourtBackendWeb.UserResolver do
       {:ok, _} ->
         perform_login(%{email: input.email, password: input.password})
 
-      {:error, changeset} ->
+      {:error, changeset=%Ecto.Changeset{}} ->
         {:error, ChangesetErrorHelper.handle_changeset_errors(changeset)}
 
       {:error, message} ->

@@ -130,7 +130,6 @@ defmodule QuickcourtBackend.Court.Claim do
       :delivery_country_id,
       :delivery_date,
       :lack_discovery_date,
-      :contract_cancellation_date,
       :claimant_country_id,
       :defendant_country_id,
       :agreement_type_label,
@@ -354,15 +353,14 @@ defmodule QuickcourtBackend.Court.Claim do
       end
 
     # TODO: ASK HOW IS IT WITH THE SERVICES AND OTHER TYPES OF AGREEMENT TYPES BESIDES SALES
-    changeset =
-      case String.downcase(agreement_type) =~ "service" and agreement_type_issue == "Cancellation" do
-        true ->
-          changeset
-          # according to the law a buyer can cancel an order at 2 months after it was executed
-          |> validate_dates_days_difference(:delivery_date, :contract_cancellation_date, 60)
+    case String.downcase(agreement_type) =~ "service" and agreement_type_issue == "Cancellation" do
+      true ->
+        changeset
+        # according to the law a buyer can cancel an order at 2 months after it was executed
+        |> validate_dates_days_difference(:delivery_date, :contract_cancellation_date, 60)
 
-        _ ->
-          changeset
+      _ ->
+        changeset
       end
   end
 
@@ -371,11 +369,18 @@ defmodule QuickcourtBackend.Court.Claim do
     agreement_type = get_field(changeset, :agreement_type_label)
     agreement_type_issue = get_field(changeset, :agreement_type_issue_label)
 
-    if agreement_type == "01 Sales contract" and agreement_type_issue == "Cancellation" do
-      changeset
-      |> validate_required(:goods_return_date)
-    else
-      changeset
+    changeset = case agreement_type == "01 Sales contract" and agreement_type_issue == "Cancellation" do
+      true -> 
+        changeset
+        |> validate_required(:goods_return_date)
+      _ -> changeset
+    end
+
+    case agreement_type_issue == "Cancellation" and agreement_type_issue != "14 Insurance contract" do
+      true -> 
+        changeset
+        |> validate_required(:contract_cancellation_date)
+      _ -> changeset
     end
   end
 
